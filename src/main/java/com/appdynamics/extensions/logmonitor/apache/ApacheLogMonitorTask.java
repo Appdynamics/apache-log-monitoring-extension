@@ -7,11 +7,13 @@
 
 package com.appdynamics.extensions.logmonitor.apache;
 
-import static com.appdynamics.extensions.logmonitor.apache.util.ApacheLogMonitorUtil.*;
+import static com.appdynamics.extensions.logmonitor.apache.util.ApacheLogMonitorUtil.closeRandomAccessFile;
+import static com.appdynamics.extensions.logmonitor.apache.util.ApacheLogMonitorUtil.resolvePath;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -20,8 +22,10 @@ import org.apache.log4j.Logger;
 import org.bitbucket.kienerj.OptimizedRandomAccessFile;
 
 import com.appdynamics.extensions.logmonitor.apache.config.ApacheLog;
+import com.appdynamics.extensions.logmonitor.apache.config.RequestClassification;
 import com.appdynamics.extensions.logmonitor.apache.exceptions.FileException;
 import com.appdynamics.extensions.logmonitor.apache.metrics.ApacheLogMetrics;
+import com.appdynamics.extensions.logmonitor.apache.metrics.GroupMetrics;
 import com.appdynamics.extensions.logmonitor.apache.processors.FilePointer;
 import com.appdynamics.extensions.logmonitor.apache.processors.FilePointerProcessor;
 
@@ -59,6 +63,13 @@ public class ApacheLogMonitorTask implements Callable<ApacheLogMetrics> {
 		
 		ApacheLogMetrics logMetrics = new ApacheLogMetrics();
 		logMetrics.setApacheLogName(getApacheLogName());
+		
+		//Initialize Request Classification Metrics
+		List<RequestClassification> requestClassifications = apacheLogConfig.getRequestClassifications();
+		GroupMetrics requestClassMetrics = logMetrics.getRequestClassificationMetrics();
+		for(RequestClassification requestClass : requestClassifications) {
+			requestClassMetrics.addMember(requestClass.getRequestName());
+		}
 		
 		OptimizedRandomAccessFile randomAccessFile = null;
 		long curFilePointer = 0;

@@ -77,6 +77,20 @@ public class ApacheLogMonitor extends AManagedMonitor {
 			try {
 				Configuration config = readFromFile(configFilename, Configuration.class);
 				
+				String lastReadPointerFileLocation = config.getLastReadPointerFileLocation();
+				if(lastReadPointerFileLocation == null || lastReadPointerFileLocation.equals("")) {
+					if(LOGGER.isDebugEnabled()) {
+						LOGGER.debug("Can't find lastReadPointerFileLocation in the configuration file. Initializing default.");
+					}
+					filePointerProcessor.initialize();
+				}else {
+					if(LOGGER.isDebugEnabled()) {
+						LOGGER.debug(String.format("lastReadPointerFileLocation in the configuration file is %s",lastReadPointerFileLocation));
+					}
+					filePointerProcessor.initialize(lastReadPointerFileLocation);
+				}
+				//System.out.println("Configuration: " + config);
+				
 				int noOfThreads = config.getNoOfThreads() > 0 ? config.getNoOfThreads() : DEFAULT_NO_OF_THREADS;
 				threadPool = Executors.newFixedThreadPool(noOfThreads);
 				
@@ -161,6 +175,7 @@ public class ApacheLogMonitor extends AManagedMonitor {
     		uploadAllMetrics(config, apacheLogPrefix, SPIDER, apacheLogMetrics.getSpiderMetrics());
     		uploadAllMetrics(config, apacheLogPrefix, VISITOR, apacheLogMetrics.getVisitorMetrics());
     		uploadPageMetrics(config, apacheLogPrefix, apacheLogMetrics.getPageMetrics());
+    		uploadRequestClassMetrics(config,apacheLogPrefix,apacheLogMetrics.getRequestClassificationMetrics());
     		uploadResponseCodeMetrics(config, apacheLogPrefix, apacheLogMetrics.getResponseCodeMetrics());
     	}
     }
@@ -198,6 +213,12 @@ public class ApacheLogMonitor extends AManagedMonitor {
     
     private void uploadPageMetrics(Configuration config, String apacheLogPrefix, GroupMetrics groupMetrics) {
     	String groupPrefix = createGroupPrefix(apacheLogPrefix, PAGE);
+    	uploadGroupMetrics(config, groupPrefix, groupMetrics, false);
+    	uploadMemberMetrics(config, groupPrefix, groupMetrics, false);
+    }
+    
+    private void uploadRequestClassMetrics(Configuration config, String apacheLogPrefix, GroupMetrics groupMetrics) {
+    	String groupPrefix = createGroupPrefix(apacheLogPrefix, REQUEST_CLASSIFICATIONS);
     	uploadGroupMetrics(config, groupPrefix, groupMetrics, false);
     	uploadMemberMetrics(config, groupPrefix, groupMetrics, false);
     }

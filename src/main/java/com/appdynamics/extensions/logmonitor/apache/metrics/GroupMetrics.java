@@ -65,6 +65,18 @@ public class GroupMetrics extends Metrics {
 	public Map<String, Metrics> getMembers() {
 		return this.members;
 	}
+	
+	public void addMember(String memberKey) {
+		if (StringUtils.isNotBlank(memberKey)) {
+			Metrics metricsCounter = this.members.get(memberKey);
+			
+			if (metricsCounter == null) {
+				metricsCounter = new Metrics();
+			}
+			
+			this.members.put(memberKey, metricsCounter);
+		}
+	}
 
 	@Override
 	public String toString() {

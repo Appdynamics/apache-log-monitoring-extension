@@ -1,4 +1,4 @@
-123.65.150.10 - - [14/Apr/2015:03:50:59 -0400] "POST /wordpress3/wp-admin/admin-ajax.php HTTP/1.1" 200 123 500 "http://www.example.com/wordpress3/wp-admin/post-new.php" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_4; en-US) AppleWebKit/534.3 (KHTML, like Gecko) Chrome/6.0.472.25 Safari/534.3"
-66.249.65.107 - - [14/Apr/2015:04:54:20 -0400] "GET /support.html HTTP/1.1" 200 1234 500 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-10.10.1.2 - - [14/Apr/2015:04:54:21 -0400] "GET /test.html?param1=value HTTP/1.1" 200 5678 500 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-localhost - - [08/Oct/2007:04:54:22 -0400] "GET /support.html HTTP/1.1" 404 456 500 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+123.65.150.10 - - [14/Apr/2015:03:50:59 -0400] "POST /wordpress3/wp-admin/admin-ajax.php HTTP/1.1" 200 123 "http://www.example.com/wordpress3/wp-admin/post-new.php" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_4; en-US) AppleWebKit/534.3 (KHTML, like Gecko) Chrome/6.0.472.25 Safari/534.3" 500
+66.249.65.107 - - [14/Apr/2015:04:54:20 -0400] "GET /support.html HTTP/1.1" 200 1234 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" 500
+10.10.1.2 - - [14/Apr/2015:04:54:21 -0400] "GET /test.html?param1=value HTTP/1.1" 200 5678 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" 500
+localhost - - [08/Oct/2007:04:54:22 -0400] "GET /support.html HTTP/1.1" 404 456 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" 500

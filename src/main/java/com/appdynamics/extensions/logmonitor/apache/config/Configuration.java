@@ -26,6 +26,8 @@ public class Configuration {
 	private int noOfThreads;
 	
 	private Set<Integer> includeResponseTimePercentiles;
+	
+	private String lastReadPointerFileLocation;
 
 	public Set<Integer> getIncludeResponseTimePercentiles() {
 		return includeResponseTimePercentiles;
@@ -61,6 +63,14 @@ public class Configuration {
 	
 	public boolean hasPercentiles() {
 		return getIncludeResponseTimePercentiles() != null && getIncludeResponseTimePercentiles().size()>0;
+	}
+
+	public String getLastReadPointerFileLocation() {
+		return lastReadPointerFileLocation;
+	}
+
+	public void setLastReadPointerFileLocation(String lastReadPointerFileLocation) {
+		this.lastReadPointerFileLocation = lastReadPointerFileLocation;
 	}
 
 	@Override

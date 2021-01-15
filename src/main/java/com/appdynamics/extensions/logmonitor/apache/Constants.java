@@ -39,6 +39,8 @@ public final class Constants {
 	
 	public static final String AGENT = "agent";
 	
+	public static final String HTTP_METHOD = "verb";
+	
 	public static final String HOST = "clientip";
 	
 	public static final String SPIDER = "Spider";
@@ -80,6 +82,8 @@ public final class Constants {
 	public static final String OS = "OS";
 	
 	public static final String PAGE = "Page";
+	
+	public static final String REQUEST_CLASSIFICATIONS = "Request Classifications";
 	
 	public static final String RESPONSE_CODE = "Response Code";
 }

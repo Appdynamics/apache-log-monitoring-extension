@@ -36,6 +36,8 @@ public class ApacheLogMetrics {
 	
 	private GroupMetrics responseCodeMetrics = new GroupMetrics();
 	
+	private GroupMetrics requestClassificationMetrics = new GroupMetrics();
+	
 	public String getApacheLogName() {
 		return apacheLogName;
 	}
@@ -66,6 +68,10 @@ public class ApacheLogMetrics {
 
 	public GroupMetrics getResponseCodeMetrics() {
 		return responseCodeMetrics;
+	}
+	
+	public GroupMetrics getRequestClassificationMetrics() {
+		return requestClassificationMetrics;
 	}
 	
 	public BigInteger getTotalHitCount() {

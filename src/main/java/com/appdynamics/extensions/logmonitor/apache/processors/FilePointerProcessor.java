@@ -34,8 +34,12 @@ public class FilePointerProcessor {
 	
 	private ObjectMapper mapper = new ObjectMapper();
 	
+	private boolean initialized = false;
+	
+	private String filePointerPath = null;
+	
 	public FilePointerProcessor() {
-		initialiseFilePointers();
+		//initialiseFilePointers();
 	}
 	
 	public void updateFilePointer(String dynamicLogPath, 
@@ -46,7 +50,13 @@ public class FilePointerProcessor {
 	}
 
 	public FilePointer getFilePointer(String dynamicLogPath, String actualLogPath) {
+		if(!initialized) {
+    		initialize();
+    	}
 		
+		if(LOGGER.isDebugEnabled()) {
+			LOGGER.debug(String.format("getFilePointer called. dynamicLogPath=%s, actualLogPath=%s",dynamicLogPath,actualLogPath));
+		}
 		dynamicLogPath = dynamicLogPath.replace("\\", "/");
 		
 		if (filePointers.containsKey(dynamicLogPath)) {
@@ -61,7 +71,11 @@ public class FilePointerProcessor {
 	}
     
     public void updateFilePointerFile() {
-    	File file = new File(getFilePointerPath());
+    	if(!initialized) {
+    		initialize();
+    	}
+    	
+    	File file = new File(this.filePointerPath);
     	
 		try {
 			mapper.writerWithDefaultPrettyPrinter().writeValue(file, filePointers);
@@ -73,30 +87,74 @@ public class FilePointerProcessor {
 		}
     }
 	
-    private void initialiseFilePointers() {
-    	LOGGER.info("Initialising filepointers...");
-    	
-    	File file = new File(getFilePointerPath());
-    	
-		if (!file.exists()) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Unable to find: " + file.getPath());
-			}
-			
-		} else {
-			try {
-				filePointers = mapper.readValue(file,
-								new TypeReference<ConcurrentHashMap<String, FilePointer>>() {
-								});
+    public void initialize() {
+    	initialiseFilePointers();
+    }
+    
+    public void initialize(String filePointerRootFolder) {
+    	String filePointerPath = null;
+    			
+    	if(!initialized) {
+    		
+    		if(filePointerRootFolder == null || filePointerRootFolder.equals("")) {
+    			filePointerPath = getFilePointerPath();
+    		}else {
+    			filePointerPath = filePointerRootFolder;
+    			if (filePointerRootFolder.endsWith(File.separator)) {
+    				filePointerPath = filePointerRootFolder + FILEPOINTER_FILENAME;
+        					
+        		} else {
+        			filePointerPath = String.format("%s%s%s", filePointerRootFolder , 
+                			File.separator, FILEPOINTER_FILENAME);
+        		}
+    		}
+    		
+    		initializeFilePointerWithFullPath(filePointerPath);
+    	}else {
+    		if(LOGGER.isDebugEnabled()) {
+    			LOGGER.debug("File Pointers Already Initialized. filePointers = " + filePointers);
+    		}
+    	}
+    }
+    
+    private void initializeFilePointerWithFullPath(String filePointerPath) {
+    	if(!initialized) {
+    		
+    		this.filePointerPath = filePointerPath;
+    		LOGGER.info("Initialising filepointers using path " + this.filePointerPath + "...");
+        	
+        	File file = new File(this.filePointerPath);
+        	
+    		if (!file.exists()) {
+    			if (LOGGER.isDebugEnabled()) {
+    				LOGGER.debug("Unable to find: " + file.getPath());
+    			}
+    			
+    		} else {
+    			try {
+    				filePointers = mapper.readValue(file,
+    								new TypeReference<ConcurrentHashMap<String, FilePointer>>() {
+    								});
 
-			} catch (Exception ex) {
-				LOGGER.error(String.format(
-								"Unfortunately an error occurred while reading filepointer %s",
-								file.getPath()), ex);
-			}
-		}
-		
-		LOGGER.info("Filepointers initialised with: " + filePointers);
+    			} catch (Exception ex) {
+    				LOGGER.error(String.format(
+    								"Unfortunately an error occurred while reading filepointer %s",
+    								file.getPath()), ex);
+    			}
+    		}
+    		
+    		LOGGER.info("Filepointers initialised with: " + filePointers);
+    		
+    		initialized = true;
+    	}else {
+    		if(LOGGER.isDebugEnabled()) {
+    			LOGGER.debug("File Pointers Already Initialized. filePointers = " + filePointers);
+    		}
+    	}   	
+    }
+    
+    private void initialiseFilePointers() {
+    	initializeFilePointerWithFullPath(getFilePointerPath());
     }
 	
     private String getFilePointerPath() {

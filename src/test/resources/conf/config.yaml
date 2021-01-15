@@ -26,3 +26,6 @@ noOfThreads: 3
 
 #prefix used to show up metrics in AppDynamics 
 metricPrefix: "Custom Metrics|Apache Log Monitor|"
+
+#last read pointer file location
+#lastReadPointerFileLocation: ""

@@ -29,3 +29,6 @@ metricPrefix: "Custom Metrics|Apache Log Monitor|"
 
 #list of percentile calculations to perform
 includeResponseTimePercentiles: []
+
+#last read pointer file location
+#lastReadPointerFileLocation: ""

@@ -7,23 +7,26 @@
 
 package com.appdynamics.extensions.logmonitor.apache;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import oi.thekraken.grok.api.exception.GrokException;
 
 import org.junit.Test;
 
 import com.appdynamics.extensions.logmonitor.apache.config.ApacheLog;
 import com.appdynamics.extensions.logmonitor.apache.config.IndividualMetricsToDisplay;
 import com.appdynamics.extensions.logmonitor.apache.config.MetricsFilterForCalculation;
+import com.appdynamics.extensions.logmonitor.apache.config.RequestClassification;
 import com.appdynamics.extensions.logmonitor.apache.metrics.ApacheLogMetrics;
 import com.appdynamics.extensions.logmonitor.apache.metrics.Metrics;
+
+import oi.thekraken.grok.api.exception.GrokException;
 
 public class MetricsExtractorTest {
 	
@@ -63,8 +66,8 @@ public class MetricsExtractorTest {
 				"src/test/resources/conf/patterns/user-agent-regexes.yaml", 
 				getTestApacheLog());
 		
-		String testLog = "10.10.1.2 - - [14/Apr/2015:04:54:21 -0400] \"GET /test.html?param1=value HTTP/1.1\" 200 5678 500 \"-\" "
-				+ "\"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)\"";
+		String testLog = "10.10.1.2 - - [14/Apr/2015:04:54:21 -0400] \"GET /test.html?param1=value HTTP/1.1\" 200 5678 \"-\" "
+				+ "\"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)\" 500";
 		
 		ApacheLogMetrics result = new ApacheLogMetrics();
 		classUnderTest.extractMetrics(testLog, result);
@@ -140,8 +143,8 @@ public class MetricsExtractorTest {
 				"src/test/resources/conf/patterns/user-agent-regexes.yaml", 
 				getTestApacheLog());
 		
-		String testLog = "10.10.1.2 - - [14/Apr/2015:04:54:21 -0400] \"GET /test.html?param1=value HTTP/1.1\" 200 5678 500 \"-\" "
-				+ "\"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_4; en-US) AppleWebKit/534.3 (KHTML, like Gecko) Chrome/6.0.472.25 Safari/534.3\"";
+		String testLog = "10.10.1.2 - - [14/Apr/2015:04:54:21 -0400] \"GET /test.html?param1=value HTTP/1.1\" 200 5678 \"-\" "
+				+ "\"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_4; en-US) AppleWebKit/534.3 (KHTML, like Gecko) Chrome/6.0.472.25 Safari/534.3\" 500";
 		
 		ApacheLogMetrics result = new ApacheLogMetrics();
 		classUnderTest.extractMetrics(testLog, result);
@@ -233,6 +236,7 @@ public class MetricsExtractorTest {
 		apacheLog.setLogPattern("%{COMBINEDAPACHELOG_WITH_RESP_TIME}");
 		apacheLog.setIndividualMetricsToDisplay(metricsToDisplay);
 		apacheLog.setMetricsFilterForCalculation(new MetricsFilterForCalculation());
+		apacheLog.setRequestClassifications(new ArrayList<RequestClassification>());
 		
 		return apacheLog;
 	}

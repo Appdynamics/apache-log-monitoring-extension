@@ -88,7 +88,9 @@ public class ApacheLogMonitorUtil {
 		if (randomAccessFile != null) {
 			try {
 				randomAccessFile.close();
-			} catch (IOException e) {}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
