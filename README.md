@@ -105,6 +105,8 @@ noOfThreads: 3
 metricPrefix: "Custom Metrics|Apache Log Monitor|"
 
 includeResponseTimePercentiles: [95,90]
+
+lastReadPointerFileLocation: "/var/log/apache2"
 ~~~
 
 ### Grok Expressions
