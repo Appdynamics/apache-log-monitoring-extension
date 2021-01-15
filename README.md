@@ -78,6 +78,14 @@ apacheLogs:
        includeOs: ["MAC.*" ]
        includeResponseCodes: [200, 305, 304, 400, 401, 500 ]
        
+    requestClassifications:
+      -  requestName: "Create New Employee"
+         urlPattern: "/api/v1/employees"
+         httpMethod: "POST"
+      -  requestName: "Get List of Employees"
+         urlPattern: "/api/v1/employees"
+         httpMethod: "GET"
+       
   - name: "DynamicLog"
     logDirectory: "/usr/log/apache2"
     logName: "access*.log"
