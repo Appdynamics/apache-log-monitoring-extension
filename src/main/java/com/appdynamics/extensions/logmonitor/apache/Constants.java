@@ -39,6 +39,8 @@ public final class Constants {
 	
 	public static final String AGENT = "agent";
 	
+	public static final String HTTP_METHOD = "verb";
+	
 	public static final String HOST = "clientip";
 	
 	public static final String SPIDER = "Spider";
@@ -55,6 +57,18 @@ public final class Constants {
 	
 	public static final String TOTAL_BANDWIDTH = "Total Bandwidth (bytes)";
 	
+	public static final String FAILURES = "Failures";
+	
+	public static final String TOTAL_FAILURES = "Total Failures";
+	
+	public static final String ERROR_RATE_PERCENTAGE = "Error Rate (%)";
+	
+	public static final String AVERGAGE_RESPONSE_TIME = "Average Response Time (ms)";
+	
+	public static final String RESPONSE_TIME_PERCENTILE = "Response Time (%d) Percentile (ms)";
+	
+	public static final String RESPONSE_TIME = "response_time";
+	
 	public static final String HITS = "Hits";
 	
 	public static final String PAGES = "Pages";
@@ -68,6 +82,8 @@ public final class Constants {
 	public static final String OS = "OS";
 	
 	public static final String PAGE = "Page";
+	
+	public static final String REQUEST_CLASSIFICATIONS = "Request Classifications";
 	
 	public static final String RESPONSE_CODE = "Response Code";
 }

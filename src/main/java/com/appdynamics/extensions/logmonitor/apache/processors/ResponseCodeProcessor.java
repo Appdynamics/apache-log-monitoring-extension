@@ -40,11 +40,11 @@ public class ResponseCodeProcessor {
 	}	
 	
 	public void processMetrics(Integer response, Integer bandwidth, 
-			boolean isPageView, ApacheLogMetrics apacheLogMetrics) {
+			boolean isPageView, ApacheLogMetrics apacheLogMetrics, boolean isSuccessfulHit, Long responseTime) {
 		
 		if (isToDisplay(response)) {
 			apacheLogMetrics.getResponseCodeMetrics()
-				.incrementMemberMetrics(response.toString(), bandwidth, isPageView);
+				.incrementMemberMetrics(response.toString(), bandwidth, isPageView, isSuccessfulHit, responseTime);
 		}
 	}
 	

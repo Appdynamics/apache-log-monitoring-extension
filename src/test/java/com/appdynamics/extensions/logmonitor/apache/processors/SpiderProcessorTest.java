@@ -76,9 +76,10 @@ public class SpiderProcessorTest {
 		
 		ApacheLogMetrics testMetrics = new ApacheLogMetrics();
 		Integer testBandwidth = 15;
+		Long testResponseTime = 100L;
 		
 		for (String spider: getTestSpiders()) {
-			classUnderTest.processMetrics(spider, testBandwidth, true, testMetrics);
+			classUnderTest.processMetrics(spider, testBandwidth, true, testMetrics,true,testResponseTime);
 		}
 		
 		assertEquals(BigInteger.valueOf(5), testMetrics.getSpiderMetrics().getHitCount());
@@ -86,6 +87,8 @@ public class SpiderProcessorTest {
 		assertEquals(BigInteger.valueOf(testBandwidth * getTestSpiders().size()), 
 				testMetrics.getSpiderMetrics().getBandwidth());
 		assertTrue(testMetrics.getSpiderMetrics().getMembers().isEmpty());
+		assertEquals(BigInteger.valueOf(testResponseTime),testMetrics.getSpiderMetrics().getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,testMetrics.getSpiderMetrics().getErrorRatePercentage());
 	}
 	
 	@Test
@@ -99,9 +102,10 @@ public class SpiderProcessorTest {
 		
 		ApacheLogMetrics testMetrics = new ApacheLogMetrics();
 		Integer testBandwidth = 15;
+		Long testResponseTime = 100L;
 		
 		for (String spider: getTestSpiders()) {
-			classUnderTest.processMetrics(spider, testBandwidth, true, testMetrics);
+			classUnderTest.processMetrics(spider, testBandwidth, true, testMetrics,true,testResponseTime);
 		}
 		
 		assertEquals(BigInteger.valueOf(5), testMetrics.getSpiderMetrics().getHitCount());
@@ -109,16 +113,22 @@ public class SpiderProcessorTest {
 		assertEquals(BigInteger.valueOf(testBandwidth * getTestSpiders().size()), 
 				testMetrics.getSpiderMetrics().getBandwidth());
 		assertEquals(2, testMetrics.getSpiderMetrics().getMembers().size());
+		assertEquals(BigInteger.valueOf(testResponseTime),testMetrics.getSpiderMetrics().getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,testMetrics.getSpiderMetrics().getErrorRatePercentage());
 		
 		Metrics slurpMetrics = testMetrics.getSpiderMetrics().getMembers().get("slurp");
 		assertEquals(BigInteger.valueOf(2), slurpMetrics.getHitCount());
 		assertEquals(BigInteger.valueOf(2), slurpMetrics.getPageViewCount());
 		assertEquals(BigInteger.valueOf(testBandwidth * 2), slurpMetrics.getBandwidth());
+		assertEquals(BigInteger.valueOf(testResponseTime),slurpMetrics.getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,slurpMetrics.getErrorRatePercentage());
 		
 		Metrics yahooMetrics = testMetrics.getSpiderMetrics().getMembers().get("yahoo");
 		assertEquals(BigInteger.ONE, yahooMetrics.getHitCount());
 		assertEquals(BigInteger.ONE, yahooMetrics.getPageViewCount());
 		assertEquals(BigInteger.valueOf(testBandwidth), yahooMetrics.getBandwidth());
+		assertEquals(BigInteger.valueOf(testResponseTime),yahooMetrics.getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,yahooMetrics.getErrorRatePercentage());
 	}
 	
 	private List<String> getTestSpiders() {

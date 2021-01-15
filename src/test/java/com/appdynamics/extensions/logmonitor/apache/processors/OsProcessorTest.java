@@ -58,9 +58,10 @@ public class OsProcessorTest {
 		
 		ApacheLogMetrics testMetrics = new ApacheLogMetrics();
 		Integer testBandwidth = 15;
+		Long testResponseTime = 100L;
 		
 		for (String os: getTestOs()) {
-			classUnderTest.processMetrics(os, testBandwidth, true, testMetrics);
+			classUnderTest.processMetrics(os, testBandwidth, true, testMetrics,true,testResponseTime);
 		}
 		
 		assertEquals(BigInteger.valueOf(5), testMetrics.getOsMetrics().getHitCount());
@@ -68,6 +69,8 @@ public class OsProcessorTest {
 		assertEquals(BigInteger.valueOf(testBandwidth * getTestOs().size()), 
 				testMetrics.getOsMetrics().getBandwidth());
 		assertTrue(testMetrics.getOsMetrics().getMembers().isEmpty());
+		assertEquals(BigInteger.valueOf(testResponseTime),testMetrics.getOsMetrics().getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,testMetrics.getOsMetrics().getErrorRatePercentage());
 	}
 	
 	@Test
@@ -81,9 +84,10 @@ public class OsProcessorTest {
 		
 		ApacheLogMetrics testMetrics = new ApacheLogMetrics();
 		Integer testBandwidth = 15;
+		Long testResponseTime = 100L;
 		
 		for (String os: getTestOs()) {
-			classUnderTest.processMetrics(os, testBandwidth, true, testMetrics);
+			classUnderTest.processMetrics(os, testBandwidth, true, testMetrics,true,testResponseTime);
 		}
 		
 		assertEquals(BigInteger.valueOf(5), testMetrics.getOsMetrics().getHitCount());
@@ -91,16 +95,22 @@ public class OsProcessorTest {
 		assertEquals(BigInteger.valueOf(testBandwidth * getTestOs().size()), 
 				testMetrics.getOsMetrics().getBandwidth());
 		assertEquals(2, testMetrics.getOsMetrics().getMembers().size());
+		assertEquals(BigInteger.valueOf(testResponseTime),testMetrics.getOsMetrics().getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,testMetrics.getOsMetrics().getErrorRatePercentage());
 		
 		Metrics macMetrics = testMetrics.getOsMetrics().getMembers().get("Mac OS X");
 		assertEquals(BigInteger.valueOf(2), macMetrics.getHitCount());
 		assertEquals(BigInteger.valueOf(2), macMetrics.getPageViewCount());
 		assertEquals(BigInteger.valueOf(testBandwidth * 2), macMetrics.getBandwidth());
+		assertEquals(BigInteger.valueOf(testResponseTime),macMetrics.getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,macMetrics.getErrorRatePercentage());
 		
 		Metrics ubuntuMetrics = testMetrics.getOsMetrics().getMembers().get("Ubuntu");
 		assertEquals(BigInteger.ONE, ubuntuMetrics.getHitCount());
 		assertEquals(BigInteger.ONE, ubuntuMetrics.getPageViewCount());
 		assertEquals(BigInteger.valueOf(testBandwidth), ubuntuMetrics.getBandwidth());
+		assertEquals(BigInteger.valueOf(testResponseTime),ubuntuMetrics.getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,ubuntuMetrics.getErrorRatePercentage());
 	}
 	
 	private List<String> getTestOs() {

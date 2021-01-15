@@ -42,15 +42,15 @@ public class SpiderProcessor {
 	}
 	
 	public void processMetrics(String agentName, Integer bandwidth, 
-			boolean isPageView, ApacheLogMetrics apacheLogMetrics) {
+			boolean isPageView, ApacheLogMetrics apacheLogMetrics, boolean isSuccessfulHit, Long responseTime) {
 		
 		if (isMatch(agentName, displayIncludesPattern)) {
 			apacheLogMetrics.getSpiderMetrics()
-				.incrementGroupAndMemberMetrics(agentName, bandwidth, isPageView);
+				.incrementGroupAndMemberMetrics(agentName, bandwidth, isPageView, isSuccessfulHit, responseTime);
 			
 		} else {
 			apacheLogMetrics.getSpiderMetrics()
-				.incrementGroupMetrics(bandwidth, isPageView);
+				.incrementGroupMetrics(bandwidth, isPageView, isSuccessfulHit, responseTime);
 		}
 	}
 }

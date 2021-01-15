@@ -8,6 +8,7 @@
 package com.appdynamics.extensions.logmonitor.apache.config;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -23,6 +24,18 @@ public class Configuration {
 	private List<ApacheLog> apacheLogs;
 
 	private int noOfThreads;
+	
+	private Set<Integer> includeResponseTimePercentiles;
+	
+	private String lastReadPointerFileLocation;
+
+	public Set<Integer> getIncludeResponseTimePercentiles() {
+		return includeResponseTimePercentiles;
+	}
+
+	public void setIncludeResponseTimePercentiles(Set<Integer> includeResponseTimePercentiles) {
+		this.includeResponseTimePercentiles = includeResponseTimePercentiles;
+	}
 
 	public String getMetricPrefix() {
 		return metricPrefix;
@@ -46,6 +59,18 @@ public class Configuration {
 
 	public void setNoOfThreads(int noOfThreads) {
 		this.noOfThreads = noOfThreads;
+	}
+	
+	public boolean hasPercentiles() {
+		return getIncludeResponseTimePercentiles() != null && getIncludeResponseTimePercentiles().size()>0;
+	}
+
+	public String getLastReadPointerFileLocation() {
+		return lastReadPointerFileLocation;
+	}
+
+	public void setLastReadPointerFileLocation(String lastReadPointerFileLocation) {
+		this.lastReadPointerFileLocation = lastReadPointerFileLocation;
 	}
 
 	@Override

@@ -36,15 +36,15 @@ public class VisitorProcessor {
 	}
 	
 	public void processMetrics(String host, Integer bandwidth, 
-			boolean isPageView, ApacheLogMetrics apacheLogMetrics) {
+			boolean isPageView, ApacheLogMetrics apacheLogMetrics, boolean isSuccessfulHit, Long responseTime) {
 		
 		if (isMatch(host, displayIncludesPattern)) {
 			apacheLogMetrics.getVisitorMetrics()
-				.incrementGroupAndMemberMetrics(host, bandwidth, isPageView);
+				.incrementGroupAndMemberMetrics(host, bandwidth, isPageView, isSuccessfulHit, responseTime);
 			
 		} else {
 			apacheLogMetrics.getVisitorMetrics()
-				.incrementGroupMetrics(bandwidth, isPageView);
+				.incrementGroupMetrics(bandwidth, isPageView, isSuccessfulHit, responseTime);
 		}
 	}
 }

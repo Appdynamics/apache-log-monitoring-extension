@@ -36,15 +36,15 @@ public class OsProcessor {
 	}
 	
 	public void processMetrics(String os, Integer bandwidth, 
-			boolean isPageView, ApacheLogMetrics apacheLogMetrics) {
+			boolean isPageView, ApacheLogMetrics apacheLogMetrics, boolean isSuccessfulHit, Long responseTime) {
 		
 		if (isMatch(os, displayIncludesPattern)) {
 			apacheLogMetrics.getOsMetrics()
-				.incrementGroupAndMemberMetrics(os, bandwidth, isPageView);
+				.incrementGroupAndMemberMetrics(os, bandwidth, isPageView, isSuccessfulHit, responseTime);
 			
 		} else {
 			apacheLogMetrics.getOsMetrics()
-				.incrementGroupMetrics(bandwidth, isPageView);
+				.incrementGroupMetrics(bandwidth, isPageView, isSuccessfulHit, responseTime);
 		}
 	}
 }

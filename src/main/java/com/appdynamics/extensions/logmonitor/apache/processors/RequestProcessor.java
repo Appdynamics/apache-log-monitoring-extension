@@ -59,16 +59,16 @@ public class RequestProcessor {
 	}
 	
 	public void processMetrics(String page, Integer bandwidth, 
-			boolean isPageView, ApacheLogMetrics apacheLogMetrics) {
+			boolean isPageView, ApacheLogMetrics apacheLogMetrics, boolean isSuccessfulHit, Long responseTime) {
 		
 		if (isPageView) {
 			if (isMatch(page, displayIncludesPattern)) {
 				apacheLogMetrics.getPageMetrics()
-					.incrementGroupAndMemberMetrics(page, bandwidth, isPageView);
+					.incrementGroupAndMemberMetrics(page, bandwidth, isPageView, isSuccessfulHit, responseTime);
 				
 			} else {
 				apacheLogMetrics.getPageMetrics()
-					.incrementGroupMetrics(bandwidth, isPageView);
+					.incrementGroupMetrics(bandwidth, isPageView, isSuccessfulHit, responseTime);
 			}
 		}	
 	}

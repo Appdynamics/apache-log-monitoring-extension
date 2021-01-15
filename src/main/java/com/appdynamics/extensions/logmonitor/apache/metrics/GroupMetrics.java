@@ -22,16 +22,16 @@ public class GroupMetrics extends Metrics {
 	
 	private Map<String, Metrics> members = new ConcurrentHashMap<String, Metrics>();
 	
-	public void incrementGroupAndMemberMetrics(String memberKey, Integer bandwidth, boolean isPageView) {
-		incrementGroupMetrics(bandwidth, isPageView);
-		incrementMemberMetrics(memberKey, bandwidth, isPageView);
+	public void incrementGroupAndMemberMetrics(String memberKey, Integer bandwidth, boolean isPageView, boolean isSuccessfulHit, Long responseTime) {
+		incrementGroupMetrics(bandwidth, isPageView, isSuccessfulHit, responseTime);
+		incrementMemberMetrics(memberKey, bandwidth, isPageView, isSuccessfulHit, responseTime);
 	}
 	
-	public void incrementGroupMetrics(Integer bandwidth, boolean isPageView) {
-		incrementMetricsCounter(this, bandwidth, isPageView);
+	public void incrementGroupMetrics(Integer bandwidth, boolean isPageView, boolean isSuccessfulHit, Long responseTime) {
+		incrementMetricsCounter(this, bandwidth, isPageView, isSuccessfulHit, responseTime);
 	}
 	
-	public void incrementMemberMetrics(String memberKey, Integer bandwidth, boolean isPageView) {
+	public void incrementMemberMetrics(String memberKey, Integer bandwidth, boolean isPageView, boolean isSuccessfulHit, Long responseTime) {
 		if (StringUtils.isNotBlank(memberKey)) {
 			Metrics metricsCounter = this.members.get(memberKey);
 			
@@ -39,12 +39,12 @@ public class GroupMetrics extends Metrics {
 				metricsCounter = new Metrics();
 			}
 			
-			incrementMetricsCounter(metricsCounter, bandwidth, isPageView);
+			incrementMetricsCounter(metricsCounter, bandwidth, isPageView, isSuccessfulHit, responseTime);
 			this.members.put(memberKey, metricsCounter);
 		}
 	}
 	
-	private void incrementMetricsCounter(Metrics counter, Integer bandwidth, boolean isPageView) {
+	private void incrementMetricsCounter(Metrics counter, Integer bandwidth, boolean isPageView, boolean isSuccessfulHit, Long responseTime) {
 		if (isPageView) {
 			counter.incrementPageViewCount();
 		}
@@ -53,11 +53,29 @@ public class GroupMetrics extends Metrics {
 			counter.addBandwidth(bandwidth);
 		}
 		
-		counter.incrementHitCount();
+		if(isSuccessfulHit) {
+			counter.incrementHitCount();
+		}else {
+			counter.incrementFailureCount();
+		}
+		
+		counter.addResponseTime(responseTime);
 	}
 	
 	public Map<String, Metrics> getMembers() {
 		return this.members;
+	}
+	
+	public void addMember(String memberKey) {
+		if (StringUtils.isNotBlank(memberKey)) {
+			Metrics metricsCounter = this.members.get(memberKey);
+			
+			if (metricsCounter == null) {
+				metricsCounter = new Metrics();
+			}
+			
+			this.members.put(memberKey, metricsCounter);
+		}
 	}
 
 	@Override

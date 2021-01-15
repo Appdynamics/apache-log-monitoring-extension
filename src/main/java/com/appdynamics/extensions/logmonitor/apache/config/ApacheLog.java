@@ -7,6 +7,7 @@
 
 package com.appdynamics.extensions.logmonitor.apache.config;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -33,6 +34,8 @@ public class ApacheLog {
 	private MetricsFilterForCalculation metricsFilterForCalculation;
 
 	private IndividualMetricsToDisplay individualMetricsToDisplay;
+	
+	private List<RequestClassification> requestClassifications;
 
 	public String getDisplayName() {
 		return displayName;
@@ -98,6 +101,14 @@ public class ApacheLog {
 	public void setIndividualMetricsToDisplay(
 			IndividualMetricsToDisplay individualMetricsToDisplay) {
 		this.individualMetricsToDisplay = individualMetricsToDisplay;
+	}
+	
+	public List<RequestClassification> getRequestClassifications() {
+		return requestClassifications;
+	}
+
+	public void setRequestClassifications(List<RequestClassification> requestClassifications) {
+		this.requestClassifications = requestClassifications;
 	}
 
 	@Override

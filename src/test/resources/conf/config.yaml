@@ -2,7 +2,7 @@ apacheLogs:
   - displayName: ""
     logDirectory: "src/test/resources/test-logs"
     logName: "access.log"
-    logPattern: "%{COMMONAPACHELOG}"
+    logPattern: "%{COMMONAPACHELOG_WITH_RESP_TIME}"
     hitResponseCodes: [ ] #leave null to use default values
     nonPageExtensions: [ ] #leave null to use default values
     
@@ -26,3 +26,6 @@ noOfThreads: 3
 
 #prefix used to show up metrics in AppDynamics 
 metricPrefix: "Custom Metrics|Apache Log Monitor|"
+
+#last read pointer file location
+#lastReadPointerFileLocation: ""

@@ -2,7 +2,7 @@
 
 ## Use Case
 
-<p>Monitors Apache access log file and reports metrics such as successful hits, bandwidth and page access count of visitors, spiders, browsers and operating systems. 
+<p>Monitors Apache access log file and reports metrics such as successful hits, failed hits, bandwidth, page access count, error rate and response time of visitors, spiders, browsers and operating systems. 
 
 Has the ability to display individual metrics per visitor, spider, browser, operating system, response code and page request.
 
@@ -28,7 +28,7 @@ This extension works only with the standalone machine agent.
 | displayName | The alias name of this log, used in metric path. |  | "Staging Apache" |
 | logDirectory | The full directory path access log |  | "/var/log/apache2" |
 | logName | The access log filename. Supports wildcard (\*) for dynamic filename |  | **Static name:**<br/>"access.log" <br/><br/>**Dynamic name:**<br/>"access\*.log" |
-| logPattern | The grok pattern used for parsing the log. See examples for pre-defined pattern you can use.<br/><br/>If you're using a custom log format, you can create your own grok pattern to match this, see Grok Expressions section.  |  | **"%{COMMONAPACHELOG}"** - for common log format<br/><br/>**"%{COMBINEDAPACHELOG}"** - for combined log format |
+| logPattern | The grok pattern used for parsing the log. See examples for pre-defined pattern you can use.<br/><br/>If you're using a custom log format, you can create your own grok pattern to match this, see Grok Expressions section.  |  | **"%{COMMONAPACHELOG_WITH_RESP_TIME}"** - for common log format<br/><br/>**"%{COMBINEDAPACHELOG_WITH_RESP_TIME}"** - for combined log format |
 | hitResponseCodes | The response codes used to determine a successful hit. Leave null to use default values. | 200, 304 | 200, 201, 304, 305 |
 | nonPageExtensions | The URL extensions used to determine if request is for non-page access, e.g. image. Leave null to use default values | "ico", "css", "js",<br/>"class","gif","jpg",<br/>"jpeg","png","bmp",<br/>"rss","xml","swf" | "pdf","jpg" |
 | **metricsFilterForCalculation** | **Filters unwanted metrics** | ----- | ----- |
@@ -47,9 +47,10 @@ This extension works only with the standalone machine agent.
 | ----- | ----- | ----- | ----- |
 | noOfThreads | The no of threads used to process multiple apache logs concurrently | 3 | 3 |
 | metricPrefix | The path prefix for viewing metrics in the metric browser. | "Custom Metrics\|Apache Log Monitor\|" | "Custom Metrics\|Apache Log Monitor2\|" |
+| includeResponseTimePercentiles | Response Time Percentiles to be calculated. | \[90,95\] | \[90,95\] |
 
 
-**\*Requires user-agent details in the log, e.g. use combined log pattern in apache + specify logPattern as "%{COMBINEDAPACHELOG}" in this config.yaml.**
+**\*Requires user-agent details in the log, e.g. use combined log pattern in apache + specify logPattern as "%{COMBINEDAPACHELOG_WITH_RESP_TIME}" in this config.yaml.**
 
 ### sample config.yaml with static filename and dynamic filename
 
@@ -58,7 +59,7 @@ apacheLogs:
   - name: "StaticName"
     logDirectory: "/var/log/apache2"
     logName: "access.log"
-    logPattern: "%{COMMONAPACHELOG}"
+    logPattern: "%{COMMONAPACHELOG_WITH_RESP_TIME}"
     hitResponseCodes: [ ] #leave null to use default values
     nonPageExtensions: [ ] #leave null to use default values
     
@@ -102,6 +103,10 @@ apacheLogs:
 noOfThreads: 3        
 
 metricPrefix: "Custom Metrics|Apache Log Monitor|"
+
+includeResponseTimePercentiles: [95,90]
+
+lastReadPointerFileLocation: "/var/log/apache2"
 ~~~
 
 ### Grok Expressions
@@ -144,31 +149,47 @@ logPattern: "%{MYCUSTOMAPACHELOG}"
 | Metric | Description |
 | ----- | ----- |
 | Hits | No of any file requests where response code matches the defined hitResponseCode |
+| Failures | No of any file requests where response code not matches the defined hitResponseCode |
 | Bandwidth (bytes) | File size in bytes |
 | Pages | The no of page requests, excluding files where extensions are defined in nonPageExtensions. |
+| Error Rate (%) | Error Rate in percentage. Calculated based on Hits and Failures |
+| Average Response Time (ms) | Average Response Time in milliseconds |
+| Response Time (\*) Percentile (ms) | Response Time in percentile. Configurable by setting includeResponseTimePercentiles parameter in config.yaml | 
 
 Typical Metric Path: **Application Infrastructure Performance|\<Tier\>|Custom Metrics|Apache Log Monitor|\<Log Name\>|** followed by the individual categories/metrics below:
 
 | Metric | Description |
 | ----- | ----- |
 | Total Hits | Overall Total Hits (Visitor Hits + Spider Hits) |
+| Total Failures | Overall Total Failures (Visitor Failures + Spider Failures) |
 | Total Bandwidth (bytes) | Overall Total Bandwidth (Visitor Bandwidth + Spider Bandwidth) |
 | Total Pages | Overall Total Pages (Visitor Pages + Spider Pages) |
+| Error Rate (%) | Error Rate in percentage. Calculated based on Hits and Failures |
+| Average Response Time (ms) | Average Response Time in milliseconds |
+| Response Time (\*) Percentile (ms) | Response Time in percentile. Configurable by setting includeResponseTimePercentiles parameter in config.yaml | 
 
 ### Visitor, Spider, OS and Browser
 
 | Metric | Description |
 | ----- | ----- |
 | Total Hits | No of hits |
+| Total Failures | No of failures |
 | Total Bandwidth (bytes) | Bandwidth size |
 | Total Pages | No of Pages |
+| Error Rate (%) | Error Rate in percentage. Calculated based on Hits and Failures |
+| Average Response Time (ms) | Average Response Time in milliseconds |
+| Response Time (\*) Percentile (ms) | Response Time in percentile. Configurable by setting includeResponseTimePercentiles parameter in config.yaml | 
 
 ### Page
 
 | Metric | Description |
 | ----- | ----- |
 | Total Hits | No of hits |
+| Total Failures | No of failures |
 | Total Bandwidth (bytes) | Bandwidth size |
+| Error Rate (%) | Error Rate in percentage. Calculated based on Hits and Failures |
+| Average Response Time (ms) | Average Response Time in milliseconds |
+| Response Time (\*) Percentile (ms) | Response Time in percentile. Configurable by setting includeResponseTimePercentiles parameter in config.yaml | 
 
 ### Response Code
 
@@ -177,6 +198,8 @@ Typical Metric Path: **Application Infrastructure Performance|\<Tier\>|Custom Me
 | Hits | No of times this response code is returned for any file request|
 | Bandwidth (bytes) | Bandwidth size |
 | Pages | No of times this response code is returned for any page request |
+| Average Response Time (ms) | Average Response Time in milliseconds |
+| Response Time (\*) Percentile (ms) | Response Time in percentile. Configurable by setting includeResponseTimePercentiles parameter in config.yaml | 
 
 ## Custom Dashboard Example
 ![image](http://community.appdynamics.com/t5/image/serverpage/image-id/1560iF816F2875A51A315/image-size/original?v=mpbl-1&px=-1)

@@ -8,12 +8,12 @@
 package com.appdynamics.extensions.logmonitor.apache.processors;
 
 import static com.appdynamics.extensions.logmonitor.apache.Constants.FILEPOINTER_FILENAME;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 
@@ -45,6 +45,15 @@ public class FilePointerProcessorTest {
 	}
 	
 	@After
+	public void cleanUp() throws Exception {
+		deleteFilePointerFile();
+	}
+	
+	@Before
+	public void setUp() throws Exception {
+		deleteFilePointerFile();
+	}
+	
 	public void deleteFilePointerFile() throws Exception {
 		File filePointerFile = new File("./target/classes/com/appdynamics/extensions/logmonitor/apache/" + 
 					FILEPOINTER_FILENAME);

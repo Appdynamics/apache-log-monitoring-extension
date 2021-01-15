@@ -36,15 +36,15 @@ public class BrowserProcessor {
 	}
 	
 	public void processMetrics(String browser, Integer bandwidth, 
-			boolean isPageView, ApacheLogMetrics apacheLogMetrics) {
+			boolean isPageView, ApacheLogMetrics apacheLogMetrics, boolean isSuccessfulHit, Long responseTime) {
 		
 		if (isMatch(browser, displayIncludesPattern)) {
 			apacheLogMetrics.getBrowserMetrics()
-				.incrementGroupAndMemberMetrics(browser, bandwidth, isPageView);
+				.incrementGroupAndMemberMetrics(browser, bandwidth, isPageView, isSuccessfulHit, responseTime);
 			
 		} else {
 			apacheLogMetrics.getBrowserMetrics()
-				.incrementGroupMetrics(bandwidth, isPageView);
+				.incrementGroupMetrics(bandwidth, isPageView, isSuccessfulHit, responseTime);
 		}
 	}
 }

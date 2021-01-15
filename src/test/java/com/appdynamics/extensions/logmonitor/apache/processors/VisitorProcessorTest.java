@@ -58,9 +58,10 @@ public class VisitorProcessorTest {
 		
 		ApacheLogMetrics testMetrics = new ApacheLogMetrics();
 		Integer testBandwidth = 15;
+		Long testResponseTime = 100L;
 		
 		for (String host: getTestHosts()) {
-			classUnderTest.processMetrics(host, testBandwidth, true, testMetrics);
+			classUnderTest.processMetrics(host, testBandwidth, true, testMetrics,true,testResponseTime);
 		}
 		
 		assertEquals(BigInteger.valueOf(5), testMetrics.getVisitorMetrics().getHitCount());
@@ -68,6 +69,8 @@ public class VisitorProcessorTest {
 		assertEquals(BigInteger.valueOf(testBandwidth * getTestHosts().size()), 
 				testMetrics.getVisitorMetrics().getBandwidth());
 		assertTrue(testMetrics.getVisitorMetrics().getMembers().isEmpty());
+		assertEquals(BigInteger.valueOf(testResponseTime),testMetrics.getVisitorMetrics().getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,testMetrics.getVisitorMetrics().getErrorRatePercentage());
 	}
 	
 	@Test
@@ -81,9 +84,10 @@ public class VisitorProcessorTest {
 		
 		ApacheLogMetrics testMetrics = new ApacheLogMetrics();
 		Integer testBandwidth = 15;
+		Long testResponseTime = 100L;
 		
 		for (String host: getTestHosts()) {
-			classUnderTest.processMetrics(host, testBandwidth, true, testMetrics);
+			classUnderTest.processMetrics(host, testBandwidth, true, testMetrics,true,testResponseTime);
 		}
 		
 		assertEquals(BigInteger.valueOf(5), testMetrics.getVisitorMetrics().getHitCount());
@@ -91,16 +95,22 @@ public class VisitorProcessorTest {
 		assertEquals(BigInteger.valueOf(testBandwidth * getTestHosts().size()), 
 				testMetrics.getVisitorMetrics().getBandwidth());
 		assertEquals(2, testMetrics.getVisitorMetrics().getMembers().size());
+		assertEquals(BigInteger.valueOf(testResponseTime),testMetrics.getVisitorMetrics().getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,testMetrics.getVisitorMetrics().getErrorRatePercentage());
 		
 		Metrics localhostMetrics = testMetrics.getVisitorMetrics().getMembers().get("localhost");
 		assertEquals(BigInteger.valueOf(2), localhostMetrics.getHitCount());
 		assertEquals(BigInteger.valueOf(2), localhostMetrics.getPageViewCount());
 		assertEquals(BigInteger.valueOf(testBandwidth * 2), localhostMetrics.getBandwidth());
+		assertEquals(BigInteger.valueOf(testResponseTime),localhostMetrics.getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,localhostMetrics.getErrorRatePercentage());
 		
 		Metrics ipMetrics = testMetrics.getVisitorMetrics().getMembers().get("10.10.10.1");
 		assertEquals(BigInteger.ONE, ipMetrics.getHitCount());
 		assertEquals(BigInteger.ONE, ipMetrics.getPageViewCount());
 		assertEquals(BigInteger.valueOf(testBandwidth), ipMetrics.getBandwidth());
+		assertEquals(BigInteger.valueOf(testResponseTime),ipMetrics.getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,ipMetrics.getErrorRatePercentage());
 	}
 	
 	private List<String> getTestHosts() {

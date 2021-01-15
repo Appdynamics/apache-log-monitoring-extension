@@ -137,18 +137,21 @@ public class RequestProcessorTest {
 		
 		ApacheLogMetrics testMetrics = new ApacheLogMetrics();
 		Integer testBandwidth = 15;
+		Long testResponseTime = 100L;
 		
 		List<String> pageUrls = Arrays.asList("/todisplay/myjsp.jsp",
 				"/test/url", "/test/mypage.html", "/todisplay/page.pdf");
 		
 		for (String page: pageUrls) {
-			classUnderTest.processMetrics(page, testBandwidth, true, testMetrics);
+			classUnderTest.processMetrics(page, testBandwidth, true, testMetrics,true,testResponseTime);
 		}
 		
 		assertEquals(BigInteger.valueOf(4), testMetrics.getPageMetrics().getHitCount());
 		assertEquals(BigInteger.valueOf(testBandwidth * pageUrls.size()), 
 				testMetrics.getPageMetrics().getBandwidth());
 		assertTrue(testMetrics.getPageMetrics().getMembers().isEmpty());
+		assertEquals(BigInteger.valueOf(testResponseTime),testMetrics.getPageMetrics().getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,testMetrics.getPageMetrics().getErrorRatePercentage());
 	}
 	
 	@Test
@@ -160,26 +163,33 @@ public class RequestProcessorTest {
 		
 		ApacheLogMetrics testMetrics = new ApacheLogMetrics();
 		Integer testBandwidth = 15;
+		Long testResponseTime = 100L;
 		
 		List<String> pageUrls = Arrays.asList("/todisplay/myjsp.jsp",
 				"/test/url", "/test/mypage.html", "/todisplay/page.pdf");
 		
 		for (String page: pageUrls) {
-			classUnderTest.processMetrics(page, testBandwidth, true, testMetrics);
+			classUnderTest.processMetrics(page, testBandwidth, true, testMetrics,true,testResponseTime);
 		}
 		
 		assertEquals(BigInteger.valueOf(4), testMetrics.getPageMetrics().getHitCount());
 		assertEquals(BigInteger.valueOf(testBandwidth * pageUrls.size()), 
 				testMetrics.getPageMetrics().getBandwidth());
 		assertEquals(2, testMetrics.getPageMetrics().getMembers().size());
+		assertEquals(BigInteger.valueOf(testResponseTime),testMetrics.getPageMetrics().getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,testMetrics.getPageMetrics().getErrorRatePercentage());
 		
 		Metrics jspMetrics = testMetrics.getPageMetrics().getMembers().get("/todisplay/myjsp.jsp");
 		assertEquals(BigInteger.ONE, jspMetrics.getHitCount());
 		assertEquals(BigInteger.valueOf(testBandwidth), jspMetrics.getBandwidth());
+		assertEquals(BigInteger.valueOf(testResponseTime),jspMetrics.getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,jspMetrics.getErrorRatePercentage());
 		
 		Metrics pdfMetrics = testMetrics.getPageMetrics().getMembers().get("/todisplay/page.pdf");
 		assertEquals(BigInteger.ONE, pdfMetrics.getHitCount());
 		assertEquals(BigInteger.valueOf(testBandwidth), pdfMetrics.getBandwidth());
+		assertEquals(BigInteger.valueOf(testResponseTime),pdfMetrics.getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,pdfMetrics.getErrorRatePercentage());
 	}
 
 }

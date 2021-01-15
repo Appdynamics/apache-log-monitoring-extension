@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -75,6 +76,20 @@ public class ApacheLogMonitor extends AManagedMonitor {
 			
 			try {
 				Configuration config = readFromFile(configFilename, Configuration.class);
+				
+				String lastReadPointerFileLocation = config.getLastReadPointerFileLocation();
+				if(lastReadPointerFileLocation == null || lastReadPointerFileLocation.equals("")) {
+					if(LOGGER.isDebugEnabled()) {
+						LOGGER.debug("Can't find lastReadPointerFileLocation in the configuration file. Initializing default.");
+					}
+					filePointerProcessor.initialize();
+				}else {
+					if(LOGGER.isDebugEnabled()) {
+						LOGGER.debug(String.format("lastReadPointerFileLocation in the configuration file is %s",lastReadPointerFileLocation));
+					}
+					filePointerProcessor.initialize(lastReadPointerFileLocation);
+				}
+				//System.out.println("Configuration: " + config);
 				
 				int noOfThreads = config.getNoOfThreads() > 0 ? config.getNoOfThreads() : DEFAULT_NO_OF_THREADS;
 				threadPool = Executors.newFixedThreadPool(noOfThreads);
@@ -154,65 +169,115 @@ public class ApacheLogMonitor extends AManagedMonitor {
     		String apacheLogPrefix = String.format("%s%s%s", getMetricPrefix(config),
     				apacheLogMetrics.getApacheLogName(), METRIC_PATH_SEPARATOR);
     		
-    		uploadSummaryMetrics(apacheLogPrefix, apacheLogMetrics);
-    		uploadAllMetrics(apacheLogPrefix, BROWSER, apacheLogMetrics.getBrowserMetrics());
-    		uploadAllMetrics(apacheLogPrefix, OS, apacheLogMetrics.getOsMetrics());
-    		uploadAllMetrics(apacheLogPrefix, SPIDER, apacheLogMetrics.getSpiderMetrics());
-    		uploadAllMetrics(apacheLogPrefix, VISITOR, apacheLogMetrics.getVisitorMetrics());
-    		uploadPageMetrics(apacheLogPrefix, apacheLogMetrics.getPageMetrics());
-    		uploadResponseCodeMetrics(apacheLogPrefix, apacheLogMetrics.getResponseCodeMetrics());
+    		uploadSummaryMetrics(config, apacheLogPrefix, apacheLogMetrics);
+    		uploadAllMetrics(config, apacheLogPrefix, BROWSER, apacheLogMetrics.getBrowserMetrics());
+    		uploadAllMetrics(config, apacheLogPrefix, OS, apacheLogMetrics.getOsMetrics());
+    		uploadAllMetrics(config, apacheLogPrefix, SPIDER, apacheLogMetrics.getSpiderMetrics());
+    		uploadAllMetrics(config, apacheLogPrefix, VISITOR, apacheLogMetrics.getVisitorMetrics());
+    		uploadPageMetrics(config, apacheLogPrefix, apacheLogMetrics.getPageMetrics());
+    		uploadRequestClassMetrics(config,apacheLogPrefix,apacheLogMetrics.getRequestClassificationMetrics());
+    		uploadResponseCodeMetrics(config, apacheLogPrefix, apacheLogMetrics.getResponseCodeMetrics());
     	}
     }
     
-    private void uploadSummaryMetrics(String apacheLogPrefix, ApacheLogMetrics apacheLogMetrics) {
-    	printCollectiveObservedCurrent(apacheLogPrefix + TOTAL_HITS, 
+    private void uploadSummaryMetrics(Configuration config, String apacheLogPrefix, ApacheLogMetrics apacheLogMetrics) {
+    	printCollectiveObservedSum(apacheLogPrefix + TOTAL_HITS, 
     			apacheLogMetrics.getTotalHitCount());
-    	printCollectiveObservedCurrent(apacheLogPrefix + TOTAL_BANDWIDTH, 
+    	printCollectiveObservedSum(apacheLogPrefix + TOTAL_BANDWIDTH, 
     			apacheLogMetrics.getTotalBandwidth());
-    	printCollectiveObservedCurrent(apacheLogPrefix + TOTAL_PAGES, 
+    	printCollectiveObservedSum(apacheLogPrefix + TOTAL_PAGES, 
     			apacheLogMetrics.getTotalPageViewCount());
+    	printCollectiveObservedSum(apacheLogPrefix + TOTAL_FAILURES, 
+    			apacheLogMetrics.getTotalFailureCount());
+    	printCollectiveObservedCurrent(apacheLogPrefix + ERROR_RATE_PERCENTAGE, 
+    			apacheLogMetrics.getErrorRatePercentage());
+    	printCollectiveObservedCurrent(apacheLogPrefix + AVERGAGE_RESPONSE_TIME, 
+    			apacheLogMetrics.getAvgResponseTime());
+    	
+    	if(config.hasPercentiles()) {
+    		Set<Integer> percentiles = config.getIncludeResponseTimePercentiles();
+    		
+    		for(Integer percentile : percentiles) {
+    			printCollectiveObservedCurrent(apacheLogPrefix + String.format(RESPONSE_TIME_PERCENTILE, percentile), 
+    	    			apacheLogMetrics.getResponseTimePercentile(percentile));
+    		}
+    	}
     }
     
-    private void uploadAllMetrics(String apacheLogPrefix, String groupName, 
+    private void uploadAllMetrics(Configuration config, String apacheLogPrefix, String groupName, 
     		GroupMetrics groupMetrics) {
     	String groupPrefix = createGroupPrefix(apacheLogPrefix, groupName);	
-    	uploadGroupMetrics(groupPrefix, groupMetrics, true);
-    	uploadMemberMetrics(groupPrefix, groupMetrics, true);
+    	uploadGroupMetrics(config, groupPrefix, groupMetrics, true);
+    	uploadMemberMetrics(config, groupPrefix, groupMetrics, true);
     }
     
-    private void uploadPageMetrics(String apacheLogPrefix, GroupMetrics groupMetrics) {
+    private void uploadPageMetrics(Configuration config, String apacheLogPrefix, GroupMetrics groupMetrics) {
     	String groupPrefix = createGroupPrefix(apacheLogPrefix, PAGE);
-    	uploadGroupMetrics(groupPrefix, groupMetrics, false);
-    	uploadMemberMetrics(groupPrefix, groupMetrics, false);
+    	uploadGroupMetrics(config, groupPrefix, groupMetrics, false);
+    	uploadMemberMetrics(config, groupPrefix, groupMetrics, false);
     }
     
-    private void uploadResponseCodeMetrics(String apacheLogPrefix, GroupMetrics groupMetrics) {
+    private void uploadRequestClassMetrics(Configuration config, String apacheLogPrefix, GroupMetrics groupMetrics) {
+    	String groupPrefix = createGroupPrefix(apacheLogPrefix, REQUEST_CLASSIFICATIONS);
+    	uploadGroupMetrics(config, groupPrefix, groupMetrics, false);
+    	uploadMemberMetrics(config, groupPrefix, groupMetrics, false);
+    }
+    
+    private void uploadResponseCodeMetrics(Configuration config, String apacheLogPrefix, GroupMetrics groupMetrics) {
     	String groupPrefix = createGroupPrefix(apacheLogPrefix, RESPONSE_CODE);
-    	uploadMemberMetrics(groupPrefix, groupMetrics, true);
+    	uploadMemberMetrics(config, groupPrefix, groupMetrics, true);
     }
     
-    private void uploadGroupMetrics(String groupPrefix, GroupMetrics groupMetrics, 
+    private void uploadGroupMetrics(Configuration config, String groupPrefix, GroupMetrics groupMetrics, 
     		boolean includePageMetrics) {
-    	printCollectiveObservedCurrent(groupPrefix + TOTAL_HITS, groupMetrics.getHitCount());
-    	printCollectiveObservedCurrent(groupPrefix + TOTAL_BANDWIDTH, groupMetrics.getBandwidth());
+    	printCollectiveObservedSum(groupPrefix + TOTAL_HITS, groupMetrics.getHitCount());
+    	printCollectiveObservedSum(groupPrefix + TOTAL_BANDWIDTH, groupMetrics.getBandwidth());
+    	printCollectiveObservedSum(groupPrefix + TOTAL_FAILURES, groupMetrics.getFailureCount());
+    	printCollectiveObservedCurrent(groupPrefix + ERROR_RATE_PERCENTAGE, groupMetrics.getErrorRatePercentage());
+    	printCollectiveObservedCurrent(groupPrefix + AVERGAGE_RESPONSE_TIME, groupMetrics.getAvgResponseTime());
     	
     	if (includePageMetrics) {
-    		printCollectiveObservedCurrent(groupPrefix + TOTAL_PAGES, groupMetrics.getPageViewCount());
+    		printCollectiveObservedSum(groupPrefix + TOTAL_PAGES, groupMetrics.getPageViewCount());
+    	}
+    	
+    	if(config.hasPercentiles()) {
+    		Set<Integer> percentiles = config.getIncludeResponseTimePercentiles();
+    		
+    		for(Integer percentile : percentiles) {
+    			printCollectiveObservedCurrent(groupPrefix + String.format(RESPONSE_TIME_PERCENTILE, percentile), 
+    					groupMetrics.getResponseTimePercentile(percentile));
+    		}
     	}
     }
     
-    private void uploadMemberMetrics(String groupPrefix, GroupMetrics groupMetrics, 
+    private void uploadMemberMetrics(Configuration config, String groupPrefix, GroupMetrics groupMetrics, 
     		boolean includePageMetrics) {
     	for (Map.Entry<String, Metrics> member : groupMetrics.getMembers().entrySet()) {
     		String memberPrefix = String.format("%s%s%s", 
     				groupPrefix, member.getKey(), METRIC_PATH_SEPARATOR);
     		
     		Metrics metrics = member.getValue();
-    		printCollectiveObservedCurrent(memberPrefix + HITS, metrics.getHitCount());
-        	printCollectiveObservedCurrent(memberPrefix + BANDWIDTH, metrics.getBandwidth());
+    		printCollectiveObservedSum(memberPrefix + HITS, metrics.getHitCount());
+    		printCollectiveObservedSum(memberPrefix + BANDWIDTH, metrics.getBandwidth());
+    		
+    		if(groupPrefix != null && !groupPrefix.endsWith(String.format("%s%s%s",METRIC_PATH_SEPARATOR,RESPONSE_CODE,METRIC_PATH_SEPARATOR))) {
+    			printCollectiveObservedSum(memberPrefix + FAILURES, metrics.getFailureCount());
+            	printCollectiveObservedCurrent(memberPrefix + ERROR_RATE_PERCENTAGE, metrics.getErrorRatePercentage());
+    		}
+    		
+        	printCollectiveObservedCurrent(memberPrefix + AVERGAGE_RESPONSE_TIME, metrics.getAvgResponseTime());
         	
         	if (includePageMetrics) {
-        		printCollectiveObservedCurrent(memberPrefix + PAGES, metrics.getPageViewCount());
+        		printCollectiveObservedSum(memberPrefix + PAGES, metrics.getPageViewCount());
+        	}
+        	
+        	if(config.hasPercentiles()) {
+        		Set<Integer> percentiles = config.getIncludeResponseTimePercentiles();
+        		
+        		for(Integer percentile : percentiles) {
+        			printCollectiveObservedCurrent(memberPrefix + String.format(RESPONSE_TIME_PERCENTILE, percentile), 
+        					metrics.getResponseTimePercentile(percentile));
+        		}
         	}
     	}
     }
@@ -221,6 +286,14 @@ public class ApacheLogMonitor extends AManagedMonitor {
         printMetric(metricName, metricValue,
                 MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
                 MetricWriter.METRIC_TIME_ROLLUP_TYPE_CURRENT,
+                MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_COLLECTIVE
+        );
+    }
+    
+    private void printCollectiveObservedSum(String metricName, BigInteger metricValue) {
+        printMetric(metricName, metricValue,
+                MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
+                MetricWriter.METRIC_TIME_ROLLUP_TYPE_SUM,
                 MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_COLLECTIVE
         );
     }

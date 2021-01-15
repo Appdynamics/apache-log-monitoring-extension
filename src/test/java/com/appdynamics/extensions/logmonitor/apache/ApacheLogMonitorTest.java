@@ -119,10 +119,10 @@ public class ApacheLogMonitorTest {
 		verifySummaryMetrics();
 		verifyBrowserMetrics();
 		verifyOsMetrics();
-		verifyPageMetrics();
-		verifyResponseCodeMetrics();
 		verifySpiderMetrics();
 		verifyVisitorMetrics();
+		verifyPageMetrics();
+		verifyResponseCodeMetrics();
 	}
 
 	private void verifySummaryMetrics() throws Exception {
@@ -132,45 +132,84 @@ public class ApacheLogMonitorTest {
 				BigInteger.valueOf(4));
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|" + TOTAL_BANDWIDTH, 
 				BigInteger.valueOf(65));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|" + TOTAL_FAILURES, 
+				BigInteger.ZERO);
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
 	}
 	
 	private void verifyBrowserMetrics() throws Exception {
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|" + TOTAL_HITS, 
 				BigInteger.valueOf(2));
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|" + TOTAL_PAGES, 
-				BigInteger.ONE);
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|" + TOTAL_BANDWIDTH, 
 				BigInteger.valueOf(3));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|" + TOTAL_FAILURES, 
+				BigInteger.ZERO);
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|" + TOTAL_PAGES, 
+				BigInteger.ONE);
 			
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|Chrome|" + HITS, 
 				BigInteger.ONE);
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|Chrome|" + PAGES, 
-				BigInteger.ONE);
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|Chrome|" + BANDWIDTH, 
+				BigInteger.ONE);
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|Chrome|" + FAILURES, 
+				BigInteger.ZERO);
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|Chrome|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|Chrome|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|Chrome|" + PAGES, 
 				BigInteger.ONE);
 			
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|IE|" + HITS, 
 				BigInteger.ONE);
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|IE|" + PAGES, 
-				BigInteger.ZERO);
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|IE|" + BANDWIDTH, 
 				BigInteger.valueOf(2));		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|IE|" + FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|IE|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|IE|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Browser|IE|" + PAGES, 
+				BigInteger.ZERO);
+		
 	}
 	
 	private void verifyOsMetrics() throws Exception {
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|" + TOTAL_HITS, 
 				BigInteger.valueOf(2));
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|" + TOTAL_PAGES, 
-				BigInteger.valueOf(2));
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|" + TOTAL_BANDWIDTH, 
 				BigInteger.valueOf(7));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|" + TOTAL_FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));	
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|" + TOTAL_PAGES, 
+				BigInteger.valueOf(2));
+		
 		
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|Mac OS X|" + HITS, 
 				BigInteger.valueOf(2));
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|Mac OS X|" + PAGES, 
-				BigInteger.valueOf(2));
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|Mac OS X|" + BANDWIDTH, 
 				BigInteger.valueOf(7));	
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|Mac OS X|" + FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|Mac OS X|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|Mac OS X|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|OS|Mac OS X|" + PAGES, 
+				BigInteger.valueOf(2));
+		
 	}
 	
 	private void verifyPageMetrics() throws Exception {
@@ -178,111 +217,183 @@ public class ApacheLogMonitorTest {
 				BigInteger.valueOf(2));
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|" + TOTAL_BANDWIDTH, 
 				BigInteger.valueOf(11));
-		
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test1.html|" + HITS, 
-				BigInteger.ONE);
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test1.html|" + BANDWIDTH, 
-				BigInteger.valueOf(5));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|" + TOTAL_FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));	
 		
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test2.html|" + HITS, 
 				BigInteger.ONE);
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test2.html|" + BANDWIDTH, 
 				BigInteger.valueOf(6));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test2.html|" + FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test2.html|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test2.html|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test1.html|" + HITS, 
+				BigInteger.ONE);
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test1.html|" + BANDWIDTH, 
+				BigInteger.valueOf(5));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test1.html|" + FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test1.html|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Page|/test1.html|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
 	}
 	
 	private void verifyResponseCodeMetrics() throws Exception {
+		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|404|" + HITS, 
+				BigInteger.ZERO);
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|404|" + BANDWIDTH, 
+				BigInteger.valueOf(10));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|404|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|404|" + PAGES, 
+				BigInteger.ONE);
+		
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|200|" + HITS, 
-				BigInteger.valueOf(2));
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|200|" + PAGES, 
 				BigInteger.valueOf(2));
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|200|" + BANDWIDTH, 
 				BigInteger.valueOf(15));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|200|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|200|" + PAGES, 
+				BigInteger.valueOf(2));
+		
 		
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|304|" + HITS, 
 				BigInteger.ONE);
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|304|" + PAGES, 
-				BigInteger.ONE);
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|304|" + BANDWIDTH, 
 				BigInteger.valueOf(9));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|304|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|304|" + PAGES, 
+				BigInteger.ONE);
 		
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|404|" + HITS, 
-				BigInteger.ONE);
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|404|" + PAGES, 
-				BigInteger.ONE);
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Response Code|404|" + BANDWIDTH, 
-				BigInteger.valueOf(10));
+		
+		
+		
 	}
 	
 	private void verifySpiderMetrics() throws Exception {
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|" + TOTAL_HITS, 
 				BigInteger.valueOf(2));
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|" + TOTAL_PAGES, 
-				BigInteger.ONE);
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|" + TOTAL_BANDWIDTH, 
 				BigInteger.valueOf(23));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|" + TOTAL_FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));	
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|" + TOTAL_PAGES, 
+				BigInteger.ONE);
+		
 		
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|GoogleBot|" + HITS, 
 				BigInteger.valueOf(2));
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|GoogleBot|" + PAGES, 
-				BigInteger.ONE);
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|GoogleBot|" + BANDWIDTH, 
 				BigInteger.valueOf(23));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|GoogleBot|" + FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|GoogleBot|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|GoogleBot|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Spider|GoogleBot|" + PAGES, 
+				BigInteger.ONE);
+		
 	}
 	
 	private void verifyVisitorMetrics() throws Exception {
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|" + TOTAL_HITS, 
 				BigInteger.valueOf(3));
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|" + TOTAL_PAGES, 
-				BigInteger.valueOf(3));
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|" + TOTAL_BANDWIDTH, 
 				BigInteger.valueOf(42));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|" + TOTAL_FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));	
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|" + TOTAL_PAGES, 
+				BigInteger.valueOf(3));
+		
 		
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|localhost|" + HITS, 
 				BigInteger.ONE);
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|localhost|" + PAGES, 
-				BigInteger.ONE);
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|localhost|" + BANDWIDTH, 
 				BigInteger.valueOf(13));
-		
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|127.0.0.1|" + HITS, 
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|localhost|" + FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|localhost|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|localhost|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|localhost|" + PAGES, 
 				BigInteger.ONE);
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|127.0.0.1|" + PAGES, 
-				BigInteger.ONE);
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|127.0.0.1|" + BANDWIDTH, 
-				BigInteger.valueOf(14));
 		
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|10.10.5.5|" + HITS, 
 				BigInteger.ONE);
-		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|10.10.5.5|" + PAGES, 
-				BigInteger.ONE);
 		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|10.10.5.5|" + BANDWIDTH, 
 				BigInteger.valueOf(15));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|10.10.5.5|" + FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|10.10.5.5|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|10.10.5.5|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|10.10.5.5|" + PAGES, 
+				BigInteger.ONE);
+		
+		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|127.0.0.1|" + HITS, 
+				BigInteger.ONE);
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|127.0.0.1|" + BANDWIDTH, 
+				BigInteger.valueOf(14));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|127.0.0.1|" + FAILURES, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|127.0.0.1|" + ERROR_RATE_PERCENTAGE, 
+				BigInteger.ZERO);		
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|127.0.0.1|" + AVERGAGE_RESPONSE_TIME, 
+				BigInteger.valueOf(100L));
+		verifyMetric("Custom Metrics|Apache Log Monitor|TestApache|Visitor|127.0.0.1|" + PAGES, 
+				BigInteger.ONE);
+		
 	}
 	
 	private void setUpTestMetricsAndApacheLogMonitorTask() throws Exception {
 		ApacheLogMetrics logMetrics = new ApacheLogMetrics();
 		logMetrics.setApacheLogName("TestApache");
+		Long responseTime = 100L;
 		
-		logMetrics.getBrowserMetrics().incrementGroupAndMemberMetrics("Chrome", 1, true);
-		logMetrics.getBrowserMetrics().incrementGroupAndMemberMetrics("IE", 2, false);
+		logMetrics.getBrowserMetrics().incrementGroupAndMemberMetrics("Chrome", 1, true,true,responseTime);
+		logMetrics.getBrowserMetrics().incrementGroupAndMemberMetrics("IE", 2, false,true,responseTime);
 		
-		logMetrics.getOsMetrics().incrementGroupAndMemberMetrics("Mac OS X", 3, true);
-		logMetrics.getOsMetrics().incrementGroupAndMemberMetrics("Mac OS X", 4, true);
+		logMetrics.getOsMetrics().incrementGroupAndMemberMetrics("Mac OS X", 3, true,true,responseTime);
+		logMetrics.getOsMetrics().incrementGroupAndMemberMetrics("Mac OS X", 4, true,true,responseTime);
 		
-		logMetrics.getPageMetrics().incrementGroupAndMemberMetrics("/test1.html", 5, true);
-		logMetrics.getPageMetrics().incrementGroupAndMemberMetrics("/test2.html", 6, true);
+		logMetrics.getPageMetrics().incrementGroupAndMemberMetrics("/test1.html", 5, true,true,responseTime);
+		logMetrics.getPageMetrics().incrementGroupAndMemberMetrics("/test2.html", 6, true,true,responseTime);
 		
-		logMetrics.getResponseCodeMetrics().incrementMemberMetrics("200", 7, true);
-		logMetrics.getResponseCodeMetrics().incrementMemberMetrics("200", 8, true);
-		logMetrics.getResponseCodeMetrics().incrementMemberMetrics("304", 9, true);
-		logMetrics.getResponseCodeMetrics().incrementMemberMetrics("404", 10, true);
+		logMetrics.getResponseCodeMetrics().incrementMemberMetrics("200", 7, true,true,responseTime);
+		logMetrics.getResponseCodeMetrics().incrementMemberMetrics("200", 8, true,true,responseTime);
+		logMetrics.getResponseCodeMetrics().incrementMemberMetrics("304", 9, true,true,responseTime);
+		logMetrics.getResponseCodeMetrics().incrementMemberMetrics("404", 10, true,false,responseTime);
 		
-		logMetrics.getSpiderMetrics().incrementGroupAndMemberMetrics("GoogleBot", 11, false);
-		logMetrics.getSpiderMetrics().incrementGroupAndMemberMetrics("GoogleBot", 12, true);
+		logMetrics.getSpiderMetrics().incrementGroupAndMemberMetrics("GoogleBot", 11, false,true,responseTime);
+		logMetrics.getSpiderMetrics().incrementGroupAndMemberMetrics("GoogleBot", 12, true,true,responseTime);
 		
-		logMetrics.getVisitorMetrics().incrementGroupAndMemberMetrics("localhost", 13, true);
-		logMetrics.getVisitorMetrics().incrementGroupAndMemberMetrics("127.0.0.1", 14, true);
-		logMetrics.getVisitorMetrics().incrementGroupAndMemberMetrics("10.10.5.5", 15, true);
+		logMetrics.getVisitorMetrics().incrementGroupAndMemberMetrics("localhost", 13, true,true,responseTime);
+		logMetrics.getVisitorMetrics().incrementGroupAndMemberMetrics("127.0.0.1", 14, true,true,responseTime);
+		logMetrics.getVisitorMetrics().incrementGroupAndMemberMetrics("10.10.5.5", 15, true,true,responseTime);
 		
 		whenNew(ApacheLogMonitorTask.class)
 			.withArguments(any(AtomicLong.class),
@@ -296,7 +407,17 @@ public class ApacheLogMonitorTest {
 	}
 	
 	private void verifyMetric(String metricName, BigInteger value) throws Exception {
-		verifyPrivate(classUnderTest).invoke("printCollectiveObservedCurrent", 
-				metricName, value);
+		if(metricName != null && (metricName.endsWith("Hits") 
+				|| metricName.endsWith("Bandwidth (bytes)")
+				 || metricName.endsWith("Pages")
+				 || metricName.endsWith("Failures")
+				 )) {
+			verifyPrivate(classUnderTest).invoke("printCollectiveObservedSum", 
+					metricName, value);
+		}else {
+			verifyPrivate(classUnderTest).invoke("printCollectiveObservedCurrent", 
+					metricName, value);
+		}
+		
 	}
 }

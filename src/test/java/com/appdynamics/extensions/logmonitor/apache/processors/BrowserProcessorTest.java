@@ -58,9 +58,10 @@ public class BrowserProcessorTest {
 		
 		ApacheLogMetrics testMetrics = new ApacheLogMetrics();
 		Integer testBandwidth = 15;
+		Long testResponseTime = 100L;
 		
 		for (String browser: getTestBrowsers()) {
-			classUnderTest.processMetrics(browser, testBandwidth, true, testMetrics);
+			classUnderTest.processMetrics(browser, testBandwidth, true, testMetrics,true,testResponseTime);
 		}
 		
 		assertEquals(BigInteger.valueOf(5), testMetrics.getBrowserMetrics().getHitCount());
@@ -68,6 +69,8 @@ public class BrowserProcessorTest {
 		assertEquals(BigInteger.valueOf(testBandwidth * getTestBrowsers().size()), 
 				testMetrics.getBrowserMetrics().getBandwidth());
 		assertTrue(testMetrics.getBrowserMetrics().getMembers().isEmpty());
+		assertEquals(BigInteger.valueOf(testResponseTime),testMetrics.getBrowserMetrics().getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,testMetrics.getBrowserMetrics().getErrorRatePercentage());
 	}
 	
 	@Test
@@ -81,9 +84,10 @@ public class BrowserProcessorTest {
 		
 		ApacheLogMetrics testMetrics = new ApacheLogMetrics();
 		Integer testBandwidth = 15;
+		Long testResponseTime = 100L;
 		
 		for (String browser: getTestBrowsers()) {
-			classUnderTest.processMetrics(browser, testBandwidth, true, testMetrics);
+			classUnderTest.processMetrics(browser, testBandwidth, true, testMetrics,true,testResponseTime);
 		}
 		
 		assertEquals(BigInteger.valueOf(5), testMetrics.getBrowserMetrics().getHitCount());
@@ -91,16 +95,22 @@ public class BrowserProcessorTest {
 		assertEquals(BigInteger.valueOf(testBandwidth * getTestBrowsers().size()), 
 				testMetrics.getBrowserMetrics().getBandwidth());
 		assertEquals(2, testMetrics.getBrowserMetrics().getMembers().size());
+		assertEquals(BigInteger.valueOf(testResponseTime),testMetrics.getBrowserMetrics().getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,testMetrics.getBrowserMetrics().getErrorRatePercentage());
 		
 		Metrics firefoxMetrics = testMetrics.getBrowserMetrics().getMembers().get("Firefox");
 		assertEquals(BigInteger.valueOf(2), firefoxMetrics.getHitCount());
 		assertEquals(BigInteger.valueOf(2), firefoxMetrics.getPageViewCount());
 		assertEquals(BigInteger.valueOf(testBandwidth * 2), firefoxMetrics.getBandwidth());
+		assertEquals(BigInteger.valueOf(testResponseTime),firefoxMetrics.getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,firefoxMetrics.getErrorRatePercentage());
 		
 		Metrics chromeMetrics = testMetrics.getBrowserMetrics().getMembers().get("Google Chrome");
 		assertEquals(BigInteger.ONE, chromeMetrics.getHitCount());
 		assertEquals(BigInteger.ONE, chromeMetrics.getPageViewCount());
 		assertEquals(BigInteger.valueOf(testBandwidth), chromeMetrics.getBandwidth());
+		assertEquals(BigInteger.valueOf(testResponseTime),chromeMetrics.getAvgResponseTime());
+		assertEquals(BigInteger.ZERO,chromeMetrics.getErrorRatePercentage());
 	}
 	
 	private List<String> getTestBrowsers() {

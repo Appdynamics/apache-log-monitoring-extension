@@ -7,31 +7,37 @@
 
 package com.appdynamics.extensions.logmonitor.apache;
 
-import static com.appdynamics.extensions.logmonitor.apache.Constants.*;
-import static com.appdynamics.extensions.logmonitor.apache.util.ApacheLogMonitorUtil.*;
+import static com.appdynamics.extensions.logmonitor.apache.Constants.AGENT;
+import static com.appdynamics.extensions.logmonitor.apache.Constants.BYTES;
+import static com.appdynamics.extensions.logmonitor.apache.Constants.HOST;
+import static com.appdynamics.extensions.logmonitor.apache.Constants.HTTP_METHOD;
+import static com.appdynamics.extensions.logmonitor.apache.Constants.REQUEST;
+import static com.appdynamics.extensions.logmonitor.apache.Constants.RESPONSE;
+import static com.appdynamics.extensions.logmonitor.apache.Constants.RESPONSE_TIME;
+import static com.appdynamics.extensions.logmonitor.apache.util.ApacheLogMonitorUtil.resolvePath;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Map;
 
-import oi.thekraken.grok.api.Grok;
-import oi.thekraken.grok.api.Match;
-import oi.thekraken.grok.api.exception.GrokException;
-
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
-
-import ua_parser.Client;
-import ua_parser.Parser;
 
 import com.appdynamics.extensions.logmonitor.apache.config.ApacheLog;
 import com.appdynamics.extensions.logmonitor.apache.metrics.ApacheLogMetrics;
 import com.appdynamics.extensions.logmonitor.apache.processors.BrowserProcessor;
 import com.appdynamics.extensions.logmonitor.apache.processors.OsProcessor;
+import com.appdynamics.extensions.logmonitor.apache.processors.RequestClassificationProcessor;
 import com.appdynamics.extensions.logmonitor.apache.processors.RequestProcessor;
 import com.appdynamics.extensions.logmonitor.apache.processors.ResponseCodeProcessor;
 import com.appdynamics.extensions.logmonitor.apache.processors.SpiderProcessor;
 import com.appdynamics.extensions.logmonitor.apache.processors.VisitorProcessor;
+
+import oi.thekraken.grok.api.Grok;
+import oi.thekraken.grok.api.Match;
+import oi.thekraken.grok.api.exception.GrokException;
+import ua_parser.Client;
+import ua_parser.Parser;
 
 /**
  * @author Florencio Sarmiento
@@ -53,6 +59,7 @@ public class MetricsExtractor {
 	private BrowserProcessor browserProcessor;
 	private OsProcessor osProcessor;
 	private RequestProcessor requestProcessor;
+	private RequestClassificationProcessor requestClassProcessor;
 	private ResponseCodeProcessor responseCodeProcessor;
 	
 	public MetricsExtractor(String grokPatternFilePath,
@@ -76,7 +83,11 @@ public class MetricsExtractor {
 				Integer response = (Integer) rawData.get(RESPONSE);
 				Integer bandwidth = (Integer) rawData.get(BYTES);
 				String request = requestProcessor.removeParam(((String) rawData.get(REQUEST)));
+				String rawRequest = (String) rawData.get(REQUEST);
+				String httpMethod = (String) rawData.get(HTTP_METHOD);
 				String userAgent = (String) rawData.get(AGENT);
+				
+				Long responseTime = ((Integer)rawData.get(RESPONSE_TIME)).longValue();
 				
 				boolean isPageView = requestProcessor.isPage(request);
 				Client agentInfo = parseUserAgent(userAgent);
@@ -91,39 +102,30 @@ public class MetricsExtractor {
 					return;
 				}
 				
-				if (!responseCodeProcessor.isSuccessfulHit(response)) {
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug(String.format(
-								"Ignoring request [%s] from [%s] as not a successful hit. Response [%s] metric may still be counted.",
-								request, host, response));
-					}
-					
-					responseCodeProcessor.processMetrics(response, bandwidth, 
-							isPageView, apacheLogMetrics);
-					
-					return;
-				}
+				boolean isSuccessfulHit = responseCodeProcessor.isSuccessfulHit(response);
 				
 				if (spiderProcessor.isSpider(agentInfo.device.family, request)) {
 					spiderProcessor.processMetrics(agentInfo.userAgent.family, bandwidth, 
-							isPageView, apacheLogMetrics);
+							isPageView, apacheLogMetrics,isSuccessfulHit,responseTime);
 					
 				} else {
 					visitorProcessor.processMetrics(host, bandwidth, 
-							isPageView, apacheLogMetrics);
+							isPageView, apacheLogMetrics,isSuccessfulHit,responseTime);
 					
 					browserProcessor.processMetrics(agentInfo.userAgent.family, 
-							bandwidth, isPageView, apacheLogMetrics);
+							bandwidth, isPageView, apacheLogMetrics,isSuccessfulHit,responseTime);
 				}
 				
 				osProcessor.processMetrics(agentInfo.os.family, 
-						bandwidth, isPageView, apacheLogMetrics);
+						bandwidth, isPageView, apacheLogMetrics,isSuccessfulHit,responseTime);
 				
 				requestProcessor.processMetrics(request, bandwidth, 
-						isPageView, apacheLogMetrics);
+						isPageView, apacheLogMetrics,isSuccessfulHit,responseTime);
+				
+				requestClassProcessor.processMetrics(rawRequest, httpMethod, bandwidth, isPageView, apacheLogMetrics, isSuccessfulHit, responseTime);
 				
 				responseCodeProcessor.processMetrics(response, bandwidth, 
-						isPageView, apacheLogMetrics);
+						isPageView, apacheLogMetrics,isSuccessfulHit,responseTime);
 				
 			} else if (LOGGER.isTraceEnabled()) {
 				LOGGER.trace(String.format("[%s] did not match grok pattern", data));
@@ -165,6 +167,10 @@ public class MetricsExtractor {
 				apacheLogConfig.getMetricsFilterForCalculation().getExcludeUrls(), 
 				apacheLogConfig.getIndividualMetricsToDisplay().getIncludePages(), 
 				apacheLogConfig.getNonPageExtensions());
+		
+		this.requestClassProcessor = new RequestClassificationProcessor(
+				apacheLogConfig.getRequestClassifications()
+				);
 		
 		this.responseCodeProcessor = new ResponseCodeProcessor(
 				apacheLogConfig.getHitResponseCodes(),

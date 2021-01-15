@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.junit.Test;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import com.appdynamics.extensions.logmonitor.apache.config.ApacheLog;
 import com.appdynamics.extensions.logmonitor.apache.config.IndividualMetricsToDisplay;
 import com.appdynamics.extensions.logmonitor.apache.config.MetricsFilterForCalculation;
+import com.appdynamics.extensions.logmonitor.apache.config.RequestClassification;
 import com.appdynamics.extensions.logmonitor.apache.metrics.ApacheLogMetrics;
 import com.appdynamics.extensions.logmonitor.apache.processors.FilePointer;
 import com.appdynamics.extensions.logmonitor.apache.processors.FilePointerProcessor;
@@ -35,11 +37,13 @@ public class ApacheLogMonitorTaskTest {
 		apacheLog.setDisplayName("TestLog");
 		apacheLog.setLogName("access.log");
 		apacheLog.setLogDirectory("src/test/resources/test-logs");
-		apacheLog.setLogPattern("%{COMMONAPACHELOG}");
+		apacheLog.setLogPattern("%{COMMONAPACHELOG_WITH_RESP_TIME}");
 		apacheLog.setHitResponseCodes(new HashSet<Integer>());
 		apacheLog.setIndividualMetricsToDisplay(new IndividualMetricsToDisplay());
 		apacheLog.setMetricsFilterForCalculation(new MetricsFilterForCalculation());
 		apacheLog.setNonPageExtensions(new HashSet<String>());
+		apacheLog.setRequestClassifications(new ArrayList<RequestClassification>());
+		filePointerProcessor.initialize("");
 		
 		classUnderTest = new ApacheLogMonitorTask(filePointerProcessor, 
 				new File("src/test/resources/conf/patterns/grok-patterns.grok").getAbsolutePath(), 
@@ -47,6 +51,7 @@ public class ApacheLogMonitorTaskTest {
 				apacheLog);
 		
 		ApacheLogMetrics result = classUnderTest.call();
+		filePointerProcessor.updateFilePointerFile();
 		assertNotNull(result);
 		
 		File testFile = new File("src/test/resources/test-logs/access.log");
