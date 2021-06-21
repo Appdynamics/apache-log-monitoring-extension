@@ -15,12 +15,13 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 
 import com.appdynamics.extensions.logmonitor.apache.ApacheLogMonitor;
+import org.slf4j.Logger;
 
 /**
  * @author Florencio Sarmiento
@@ -28,7 +29,7 @@ import com.appdynamics.extensions.logmonitor.apache.ApacheLogMonitor;
  */
 public class FilePointerProcessor {
 	
-	public static final Logger LOGGER = Logger.getLogger("com.singularity.extensions.logmonitor.apache.FilePointerProcessor");
+	public static final Logger LOGGER = ExtensionsLoggerFactory.getLogger(FilePointerProcessor.class);
 	
 	private ConcurrentHashMap<String, FilePointer> filePointers = new ConcurrentHashMap<String, FilePointer>();
 	
@@ -64,14 +65,14 @@ public class FilePointerProcessor {
 			mapper.writerWithDefaultPrettyPrinter().writeValue(file, filePointers);
 	 
 		} catch (Exception ex) {
-    		LOGGER.error(String.format(
+			LOGGER.error(String.format(
 					"Unfortunately an error occurred while saving filepointers to %s", 
 					file.getPath()), ex);
 		}
     }
 	
     private void initialiseFilePointers() {
-    	LOGGER.info("Initialising filepointers...");
+		LOGGER.info("Initialising filepointers...");
     	
     	File file = new File(getFilePointerPath());
     	
@@ -92,7 +93,7 @@ public class FilePointerProcessor {
 								file.getPath()), ex);
 			}
 		}
-		
+
 		LOGGER.info("Filepointers initialised with: " + filePointers);
     }
 	
@@ -123,7 +124,7 @@ public class FilePointerProcessor {
     		}
     		
     	} catch (Exception ex) {
-    		LOGGER.warn("Unable to resolve installation dir, finding an alternative.");
+			LOGGER.warn("Unable to resolve installation dir, finding an alternative.");
     	}
     	
     	if (StringUtils.isBlank(path)) {

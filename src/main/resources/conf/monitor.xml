@@ -8,6 +8,7 @@
 <monitor>
     <name>ApacheLogMonitor</name>
     <type>managed</type>
+    <enabled>true</enabled>
     <description>ApacheLog monitor</description>
     <monitor-configuration></monitor-configuration>
     <monitor-run-task>
@@ -20,7 +21,9 @@
         <execution-timeout-in-secs>60</execution-timeout-in-secs>
         
 		<task-arguments>
-			<argument name="config-dir" is-required="true" default-value="monitors/ApacheLogMonitor/conf" />
+			<argument name="config-file" is-required="true" default-value="monitors/ApacheLogMonitor/conf/config.yml" />
+            <argument name="grok-pattern-file" is-required="true" default-value="monitors/ApacheLogMonitor/conf/patterns/grok-patterns.grok" />
+            <argument name="user-agent-regex-file" is-required="true" default-value="monitors/ApacheLogMonitor/conf/patterns/user-agent-regexes.yaml" />
 		</task-arguments>
                 
         <java-task>

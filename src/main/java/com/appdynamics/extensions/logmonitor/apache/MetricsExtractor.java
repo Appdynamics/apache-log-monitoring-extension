@@ -14,13 +14,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Map;
 
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import oi.thekraken.grok.api.Grok;
 import oi.thekraken.grok.api.Match;
 import oi.thekraken.grok.api.exception.GrokException;
 
-import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 
+import org.slf4j.Logger;
 import ua_parser.Client;
 import ua_parser.Parser;
 
@@ -38,9 +39,8 @@ import com.appdynamics.extensions.logmonitor.apache.processors.VisitorProcessor;
  *
  */
 public class MetricsExtractor {
-	
-	private static final Logger LOGGER = 
-			Logger.getLogger("com.singularity.extensions.logmonitor.apache.MetricsExtractor");
+
+	private static final Logger logger = ExtensionsLoggerFactory.getLogger(MetricsExtractor.class);
 	
 	private ApacheLog apacheLogConfig;
 	
@@ -82,8 +82,8 @@ public class MetricsExtractor {
 				Client agentInfo = parseUserAgent(userAgent);
 				
 				if (!isToMonitorMetrics(host, request, agentInfo)) {
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug(String.format(
+					if (logger.isDebugEnabled()) {
+						logger.debug(String.format(
 								"Excluded Host [%s], Request [%s], User-Agent [%s], OS [%s]",
 								host, request, agentInfo.userAgent.family, agentInfo.os.family));
 					}
@@ -92,8 +92,8 @@ public class MetricsExtractor {
 				}
 				
 				if (!responseCodeProcessor.isSuccessfulHit(response)) {
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug(String.format(
+					if (logger.isDebugEnabled()) {
+						logger.debug(String.format(
 								"Ignoring request [%s] from [%s] as not a successful hit. Response [%s] metric may still be counted.",
 								request, host, response));
 					}
@@ -125,12 +125,12 @@ public class MetricsExtractor {
 				responseCodeProcessor.processMetrics(response, bandwidth, 
 						isPageView, apacheLogMetrics);
 				
-			} else if (LOGGER.isTraceEnabled()) {
-				LOGGER.trace(String.format("[%s] did not match grok pattern", data));
+			} else if (logger.isTraceEnabled()) {
+				logger.trace(String.format("[%s] did not match grok pattern", data));
 			}
 			
 		} catch (Exception ex) {
-			LOGGER.error(String.format("Unable to extract metrics for line [%s] due to error.",
+			logger.error(String.format("Unable to extract metrics for line [%s] due to error.",
 					data), ex);
 		} 
 	}
