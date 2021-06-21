@@ -117,7 +117,7 @@ apacheLogs:
        includeOs: [ ]
        includeResponseCodes: [ ]
         
-noOfThreads: 3        
+numberOfThreads: 5        
 
 metricPrefix: "Custom Metrics|Apache Log Monitor|"
 ~~~
