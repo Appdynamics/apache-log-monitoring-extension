@@ -1,27 +1,46 @@
 # AppDynamics Apache Log Monitoring Extension
 
+This extension works only with the standalone machine agent.
+
 ## Use Case
 
 <p>Monitors Apache access log file and reports metrics such as successful hits, bandwidth and page access count of visitors, spiders, browsers and operating systems. 
 
 Has the ability to display individual metrics per visitor, spider, browser, operating system, response code and page request.
 
-This extension works only with the standalone machine agent.
+**Note: By default, the Machine agent can only send a fixed number of metrics to the controller. This extension can potentially report thousands of metrics, so to change this limit, please follow the instructions mentioned [here](https://docs.appdynamics.com/21.6/en/application-monitoring/administer-app-server-agents/metrics-limits).** 
 
-**Note: By default, the Machine agent can only send a fixed number of metrics to the controller. This extension can potentially report thousands of metrics, so to change this limit, please follow the instructions mentioned [here](https://docs.appdynamics.com/display/PRO40/Metrics+Limits).** 
+## Prerequisite
+
+1. Before the extension is installed, the prerequisites mentioned [here](https://community.appdynamics.com/t5/Knowledge-Base/Extensions-Prerequisites-Guide/ta-p/35213) need to be met. Please do not proceed with the extension installation if the specified prerequisites are not met.
+2. The extension must be deployed on same box as the one with apache logs files you wish to monitor.
 
 ## Installation
 
 1. Run 'mvn clean install' from apache-log-monitoring-extension directory
 2. Copy and unzip ApacheLogMonitor-\<version\>.zip from 'target' directory into \<machine_agent_dir\>/monitors/
-3. Edit config.yaml file in ApacheLogMonitor/conf and provide the required configuration (see Configuration section)
+3. Edit config.yml file in ApacheLogMonitor/conf and provide the required configuration (see Configuration section)
 4. Restart the Machine Agent.
+
+Please place the extension in the "monitors" directory of your Machine Agent installation directory. Do not place the extension in the "extensions" directory of your Machine Agent installation directory.
 
 ## Configuration
 
-### config.yaml
+### config.yml
 
 **Note: Please avoid using tab (\t) when editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/).**
+
+#### Configure Metric Prefix
+Please follow section 2.1 of the [Document](https://community.appdynamics.com/t5/Knowledge-Base/How-do-I-troubleshoot-missing-custom-metrics-or-extensions/ta-p/28695) to set up metric prefix.
+~~~
+# Use this only if SIM is enabled
+#metricPrefix: "Custom Metrics|Apache Log Monitor|"
+
+# If SIM is not enabled, then use this
+metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|Apache Log Monitor|"
+~~~
+
+#### Apache log configurations
 
 | Param | Description | Default Value | Example |
 | ----- | ----- | ----- | ----- |
@@ -45,8 +64,7 @@ This extension works only with the standalone machine agent.
 | includeOs* | The list of OS names to display. Note, this supports regex. |  | **Specific OS:**<br/>"MAC OS X"<br/><br/>**OS Regex:**<br/>"MAC.\*" |
 | includeResponseCodes* | The list of response codes to display. |  | 200, 304, 404 500 |
 | ----- | ----- | ----- | ----- |
-| noOfThreads | The no of threads used to process multiple apache logs concurrently | 3 | 3 |
-| metricPrefix | The path prefix for viewing metrics in the metric browser. | "Custom Metrics\|Apache Log Monitor\|" | "Custom Metrics\|Apache Log Monitor2\|" |
+| numberOfThreads | The no of threads used to process multiple apache logs concurrently | 3 | 3 |
 
 
 **\*Requires user-agent details in the log, e.g. use combined log pattern in apache + specify logPattern as "%{COMBINEDAPACHELOG}" in this config.yaml.**
@@ -99,7 +117,7 @@ apacheLogs:
        includeOs: [ ]
        includeResponseCodes: [ ]
         
-noOfThreads: 3        
+numberOfThreads: 5        
 
 metricPrefix: "Custom Metrics|Apache Log Monitor|"
 ~~~
@@ -136,6 +154,13 @@ Then, define your custom expression in logPattern field in config.yaml, e.g.
 ...
 logPattern: "%{MYCUSTOMAPACHELOG}"
 ...
+~~~
+
+### monitor.xml
+~~~
+<argument name="config-file" is-required="true" default-value="monitors/ApacheLogMonitor/conf/config.yml" />
+<argument name="grok-pattern-file" is-required="true" default-value="monitors/ApacheLogMonitor/conf/patterns/grok-patterns.grok" />
+<argument name="user-agent-regex-file" is-required="true" default-value="monitors/ApacheLogMonitor/conf/patterns/user-agent-regexes.yaml" />
 ~~~
 
 ## Metrics
@@ -178,18 +203,40 @@ Typical Metric Path: **Application Infrastructure Performance|\<Tier\>|Custom Me
 | Bandwidth (bytes) | Bandwidth size |
 | Pages | No of times this response code is returned for any page request |
 
+## Extensions Workbench
+Workbench is an inbuilt feature provided with each extension in order to assist you to fine tune the extension setup before you actually deploy it on the controller. Please review the following document on [How to use the Extensions WorkBench](https://community.appdynamics.com/t5/Knowledge-Base/How-do-I-use-the-Extensions-WorkBench/ta-p/30130).
+
 ## Custom Dashboard Example
 ![image](http://community.appdynamics.com/t5/image/serverpage/image-id/1560iF816F2875A51A315/image-size/original?v=mpbl-1&px=-1)
+
+## Troubleshooting
+Please follow the steps listed in this [troubleshooting-document](https://community.appdynamics.com/t5/Knowledge-Base/How-do-I-troubleshoot-missing-custom-metrics-or-extensions/ta-p/28695) in order to troubleshoot your issue. These are a set of common issues that customers might have faced during the installation of the extension. If these don't solve your issue, please follow the last step on the [troubleshooting-document](https://community.appdynamics.com/t5/Knowledge-Base/How-do-I-troubleshoot-missing-custom-metrics-or-extensions/ta-p/28695) to contact the support team.
+
+## Support Tickets
+
+If after going through the [Troubleshooting Document](https://community.appdynamics.com/t5/Knowledge-Base/How-do-I-troubleshoot-missing-custom-metrics-or-extensions/ta-p/28695) you have not been able to get your extension working, please file a ticket with the following information:
+
+1. Stop the running machine agent.
+2. Delete all existing logs under <MachineAgent>/logs.
+3. Please enable debug logging by editing the file <MachineAgent>/conf/logging/log4j.xml. Change the level value of the following <logger> elements to debug.
+    ```
+    <logger name="com.singularity">
+    <logger name="com.appdynamics">
+   ```
+4. Start the machine agent and please let it run for 10 mins. Then zip and upload all the logs in the directory <MachineAgent>/logs/*.
+   Attach the zipped <MachineAgent>/conf/* directory.
+5. Attach the zipped <MachineAgent>/monitors/ExtensionFolderYouAreHavingIssuesWith directory.
+
+For any support related questions, you can also contact help@appdynamics.com.
 
 ## Contributing
 
 Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/apache-log-monitoring-extension).
 
-## Community
-
-Find out more in the [AppSphere](https://www.appdynamics.com/community/exchange/extension/apache-log-monitoring-extension/) community.
-
-## Support
-
-For any questions or feature request, please contact [AppDynamics Support](mailto:help@appdynamics.com).
-
+## Version
+|          Name            |  Version   |
+|--------------------------|------------|
+|Extension Version         |2.0.0       |
+|Controller Compatibility  |4.5 or Later|
+|Machine Agent Version     |4.5.13+     |
+|Last Update               |21/06/2021  |

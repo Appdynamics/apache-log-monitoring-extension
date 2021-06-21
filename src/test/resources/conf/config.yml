@@ -1,0 +1,49 @@
+#prefix used to show up metrics in AppDynamics
+metricPrefix: "Custom Metrics|Apache Log Monitor|"
+
+apacheLogs:
+  - displayName: "my apache logs"
+    logDirectory: "src/test/resources/test-logs"
+    logName: "access.log"
+    logPattern: "%{COMMONAPACHELOG}"
+    hitResponseCodes: [ ] #leave null to use default values
+    nonPageExtensions: [ ] #leave null to use default values
+    
+    metricsFilterForCalculation:
+       excludeVisitors: [ ]
+       excludeSpiders: [ ]
+       excludeUrls: [ ]
+       excludeBrowsers: [ ]
+       excludeOs: [ ]
+      
+    individualMetricsToDisplay:
+       includeVisitors: [ ]
+       includeSpiders: [".*" ]
+       includePages: [".*" ]
+       includeBrowsers: [".*" ]
+       includeOs: [".*" ]
+       includeResponseCodes: [200, 305, 304, 400, 401, 500 ]
+        
+# Number of concurrent threads
+numberOfThreads: 5
+
+
+controllerInfo:
+  controllerHost: ""  # -Dappdynamics.controller.hostName
+  controllerPort:  # -Dappdynamics.controller.port
+  controllerSslEnabled: false # -Dappdynamics.controller.ssl.enabled
+  enableOrchestration: false # N/A
+  uniqueHostId: "" # -Dappdynamics.agent.uniqueHostId
+  username: "admin" # -Dappdynamics.agent.monitors.controller.username
+  password: "" # -Dappdynamics.agent.monitors.controller.password
+  #encryptedPassword: "j+0oxTzUtw2xAdaq4UUq/Q==" # -Dappdynamics.agent.monitors.controller.encryptedPassword
+  accountAccessKey: "" # -Dappdynamics.agent.accountAccessKey
+  account: "" # -Dappdynamics.agent.accountName
+  machinePath: "" # -Dappdynamics.machine.agent.hierarchyPath
+  simEnabled: false # -Dappdynamics.sim.enabled
+  applicationName: "" # -Dappdynamics.agent.applicationName
+  tierName: "" # -Dappdynamics.agent.tierName
+  nodeName: "" # -Dappdynamics.agent.nodeName
+
+#Encryption key for your controllerInfo password
+encryptionKey: "abcd"

@@ -1,0 +1,55 @@
+# Use this only if SIM is enabled
+#metricPrefix: "Custom Metrics|Apache Log Monitor|"
+
+# If SIM is not enabled, then use this
+metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|Apache Log Monitor|"
+#To find the <COMPONENT_ID> in your environment,
+#please follow the screenshot https://community.appdynamics.com/t5/Knowledge-Base/How-do-I-troubleshoot-missing-custom-metrics-or-extensions/ta-p/28695
+
+
+apacheLogs:
+  - displayName: "my apache logs"
+    logDirectory: "/var/log/apache2"
+    logName: "access.log"
+    logPattern: "%{COMMONAPACHELOG}"
+    hitResponseCodes: [ ] #leave null to use default values
+    nonPageExtensions: [ ] #leave null to use default values
+
+    metricsFilterForCalculation:
+       excludeVisitors: [ ]
+       excludeSpiders: [ ]
+       excludeUrls: [ ]
+       excludeBrowsers: [ ]
+       excludeOs: [ ]
+
+    individualMetricsToDisplay:
+       includeVisitors: [ ]
+       includeSpiders: [ ]
+       includePages: [ ]
+       includeBrowsers: [ ]
+       includeOs: [ ]
+       includeResponseCodes: [ ]
+        
+# number of concurrent tasks
+numberOfThreads: 5
+
+
+controllerInfo:
+  controllerHost: ""  # -Dappdynamics.controller.hostName
+  controllerPort:  # -Dappdynamics.controller.port
+  controllerSslEnabled: false # -Dappdynamics.controller.ssl.enabled
+  enableOrchestration: false # N/A
+  uniqueHostId: "" # -Dappdynamics.agent.uniqueHostId
+  username: "admin" # -Dappdynamics.agent.monitors.controller.username
+  password: "" # -Dappdynamics.agent.monitors.controller.password
+  #encryptedPassword: "j+0oxTzUtw2xAdaq4UUq/Q==" # -Dappdynamics.agent.monitors.controller.encryptedPassword
+  accountAccessKey: "" # -Dappdynamics.agent.accountAccessKey
+  account: "" # -Dappdynamics.agent.accountName
+  machinePath: "" # -Dappdynamics.machine.agent.hierarchyPath
+  simEnabled: false # -Dappdynamics.sim.enabled
+  applicationName: "" # -Dappdynamics.agent.applicationName
+  tierName: "" # -Dappdynamics.agent.tierName
+  nodeName: "" # -Dappdynamics.agent.nodeName
+
+#Encryption key for your controllerInfo password
+encryptionKey: "abcd"
