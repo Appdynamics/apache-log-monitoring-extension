@@ -27,10 +27,12 @@ public class ApacheLogMonitorITest {
 	@Test
 	public void testMetricsCollection() throws Exception {
 		Map<String, String> args = Maps.newHashMap();
-		args.put("config-dir","src/test/resources/conf");
-		
+		args.put("config-file","src/test/resources/conf/config.yml");
+		args.put("grok-pattern-file","src/test/resources/conf/grok-patterns.grok");
+		args.put("user-agent-regex-file","src/test/resources/conf/user-agent-regexes.yaml");
+
 		TaskOutput result = classUnderTest.execute(args, null);
-		assertTrue(result.getStatusMessage().contains("successfully completed"));
+		assertTrue(result.getStatusMessage().contains("ApacheLogMonitor completes"));
 	}
 	
 	@After
